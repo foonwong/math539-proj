@@ -1,0 +1,50 @@
+col_number,col_name,R_class,unique_count,need_clarification,notes,pandas_dtype,unique
+32,NightFlight,factor,3,N,,,"Normal, RedEye"
+33,FlightType,factor,3,N,,,"Domestic, International"
+36,AC Frame,factor,3,Y,What does this mean?,,"NB, WB"
+39,IFE,factor,3,Y,What does this mean?,,"0, 1"
+40,eXTV,factor,3,Y,What does this mean?,,"0, 1"
+41,eXPhone,factor,3,Y,What does this mean?,,"0, 1"
+42,OneMedia,factor,3,Y,What does this mean?,,"0, 1"
+49,luxury,factor,3,Y,Would like more details,,"0, 1"
+34,Category,factor,4,Y,Is this based on consumer usage or package purchased?,,"Browsing, Streaming, Text"
+15,FlightDurationType,factor,5,N,,,"Long-Haul, Medium-Haul, Short-Haul, Ultra Long-Haul, Ultra Short-Haul"
+25,AntennaType,factor,5,Y,Any more on cost to panasonic?,,"C: Commerc, DPA-02, Melco, SPA-01"
+35,Airline_Region,factor,5,N,,,"Americas, Asia, Europe, Japan, Middle East"
+43,Service_count,numeric,6,Y,What does this mean?,,"1, 2, 3, 4, 5"
+6,PaymentCardType,factor,10,N,,,"AMEX, CUP, DC, DISC, JCB, MC, NotApplicable, Unknown, VISA"
+27,Orig_Region,factor,10,N,,,"Africa, Americas, Asia, Asia/ Europe, Asia/ Middle East, Europe, Europe/ Africa, Middle East, Oceania"
+45,Dest_Region,factor,10,N,,,"Africa, Americas, Asia, Asia/ Europe, Asia/ Middle East, Europe, Europe/ Africa, Middle East, Oceania"
+4,SessionAccountType,factor,12,Y,Would like more details,,"COMP-TOKEN, CreditCard, Panasonic, Panasonic - FirstDat, Panasonic - PROD, PayPal, PayPal - PROD, PayPal-PRD, Valor Mileage, Voucher, Voucher+CC, WISP"
+7,DeviceTypes,factor,17,N,,,"laptop, laptop,mobile, laptop,mobile,tablet, laptop,tablet, laptop,tablet,mobile, mobile, mobile,laptop, mobile,laptop,tablet, mobile,tablet, mobile,tablet,laptop, tablet, tablet,laptop, tablet,laptop,mobile, tablet,mobile, tablet,mobile,laptop, UNKNOWN"
+14,Airline,factor,23,N,,,"AAL, AAR, AEA, AMX, ANA, ASL, AZA, CPA, CRK, EWG, FIN, IBE, KAC, KLM, MAS, QTR, REU, RWD, SEY, SIA, SWR, THA, WJA"
+17,AircraftType,factor,28,N,,,"319-100, 320-100, 320-200, 320-230, 321-100, 321-200, 330-200, 330-220, 330-240, 330-300, 340-300, 350-1000, 350-900, 737-700, 737-800, 737-MAX8, 757-200, 767-300, 767-300ER, 777-200, 777-200ER, 777-220, 777-240, 777-300, 777-300ER, 787-10, 787-8, 787-9"
+47,Economy_pct,numeric,30,Y,What does this mean?,,"0, 52, 60, 61, 62, 65, 66, 67, 68, 70, 73, 74, 76, 77, 78, 79, 80, 82, 83, 86, 87, 88, 89, 90, 91, 92, 93, 95, 96, 100"
+48,BusPassPercent,numeric,30,Y,What does this mean?,,"15, 18.4, 19.25, 20.95, 21.8, 22.65, 23.5, 24.35, 25.2, 26.05, 26.9, 29.45, 30.3, 32, 32.85, 33.7, 34.55, 35.4, 37.1, 37.95, 40.5, 42.2, 43.05, 43.9, 44.75, 47.3, 48.15, 49, 55.8, 100"
+46,JackSeatCount,numeric,65,Y,What does this mean?,,"130, 144, 146, 154, 161, 166, 167, 169, 174, 176, 189, 194, 209, 215, 223, 226, 236, 240, 243, 246, 249, 253, 254, 256, 258, 260, 262, 263, 264, 270, 271, 274, 280, 285, 286, 288, 289, 291, 293, 294, 296, 297, 298, 299, 300, 306, 308, 310, 311, 313, 321, 333, 334, 335, 336, 337, 340, 382, 388, 395, 405, 425, 438, 442, 514"
+29,WiFiUsers,numeric,88,Y,What does this mean?,,"1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 86, 96, 115, 128, 135"
+30,SeatCount,numeric,91,Y,What does this mean?,,"6, 52, 119, 124, 128, 130, 154, 155, 160, 161, 166, 167, 168, 174, 175, 180, 182, 183, 184, 189, 197, 200, 208, 209, 214, 215, 226, 234, 236, 237, 240, 243, 246, 248, 253, 254, 255, 256, 258, 260, 262, 263, 264, 265, 266, 268, 270, 271, 273, 274, 277, 280, 282, 284, 285, 286, 288, 289, 291, 292, 293, 294, 296, 297, 298, 299, 304, 310, 311, 313, 316, 318, 321, 325, 331, 333, 334, 336, 337, 340, 342, 355, 358, 377, 382, 395, 408, 412, 417, 438"
+38,Price/USD,numeric,101,N,,,NA
+26,Orig_Country,factor,137,N,,,NA
+44,Dest_Country,factor,138,N,,,NA
+5,ProductName,character,144,N,,,NA
+31,TotalPassengers,numeric,177,N,,,NA
+19,DestinationIATA,character,439,N,,,NA
+18,OriginIATA,character,452,N,,,NA
+16,TailNumber,character,689,N,,,NA
+24,FlightDurationHrs,numeric,1076,N,,,NA
+10,SessionDurationMinutes,numeric,2939,N,,,NA
+37,Routes,character,3048,N,,,NA
+11,SessionVolumeUpAmount,numeric,71070,N,,,NA
+12,SessionVolumeDownAmount,numeric,120729,N,,,NA
+28,TotalUsageMB,numeric,210155,N,,,NA
+22,DepartureTimeLocal,"POSIXct, POSIXt",394609,N,,,NA
+23,LandingTimeLocal,"POSIXct, POSIXt",400013,N,,,NA
+20,DepartureTimeUTC,"POSIXct, POSIXt",430356,N,,,NA
+21,LandingTimeUTC,"POSIXct, POSIXt",434820,N,,,NA
+13,FlightID,numeric,567089,N,,,NA
+2,UserID,numeric,1068154,N,,,NA
+9,SessionEndTime,"POSIXct, POSIXt",3667425,N,,,NA
+8,SessionStartTime,"POSIXct, POSIXt",4010759,N,,,NA
+3,SessionID,character,4181197,N,,,NA
+1,RawDataKey,numeric,4181546,N,,,NA
