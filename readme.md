@@ -1,9 +1,7 @@
 # Dynamic Pricing Onboard WiFi
 
 * Contact: sam.sirafi@panasonic.aero
-* zoom: https://fullerton.zoom.us/j/624416186
 * Trello: https://trello.com/wifidyanmicpricing
-
 
 ## Members
 * Tingting Xu
@@ -13,3 +11,5 @@
 * Tin Huynh
 * Jessica Shin
 * Foon Wong
+
+---
