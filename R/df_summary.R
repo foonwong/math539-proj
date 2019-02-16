@@ -1,7 +1,16 @@
 library(tidyverse)
 
-pana_df = read_csv("~/Downloads/df_rfp_dataset_raw_20181218185047.csv")
+ref = read_csv("data_reference.csv")
+col_type = as.list(ref$dplyr_type)
+names(col_type) = ref$col_name
 
+pana_df = read_csv(
+    "df_rfp_dataset_raw_20181218185047.csv",
+    col_types = col_type
+)
+
+
+## Helper funs ---------------------------------------------------------------
 get_fct_unique_count = function(col) {
     length(unique(col))
 }
@@ -20,6 +29,8 @@ get_fct_R_class = function(col) {
     paste(class(col), collapse = ", ")
 }
 
+## ---------------------------------------------------------------------------
+
 pana_ref = pana_df %>%
     rename_all(function(x) paste0(x, "@@@")) %>%
     summarise_all(funs(get_fct_R_class, get_fct_unique, get_fct_unique_count)) %>%
@@ -34,15 +45,40 @@ pana_ref = pana_df %>%
     left_join(tibble(col_name = colnames(pana_df), col_number = 1:ncol(pana_df))) %>%
     rename_all(str_remove_all, pattern = "get_fct_")
 
-pana_ref %>%
+
+## adding type for dplyr/pandas ----------------------------------------
+dplyr_type = c(
+    # from ?readr
+    character = "c",          # character
+    integer = "i",            # integer
+    numeric = "n",            # number
+    double = "d",             # double
+    logical = "l",            # logical
+    factor = "f",             # factor
+    noidea = "D",             # date
+    `POSIXct, POSIXt` = "T",  # date time
+    noidea = "t",             # time
+    guess = "?",              # guess
+    skip = "_/-"              # to skip the column.
+)
+
+pandas_type = c(
+    character = "object",
+    integer = "int",
+    numeric = "float",
+    double = "float",
+    logical = "bool",
+    factor = "category",
+    `POSIXct, POSIXt` = "datetime64"
+)
+
+pana_ref$dplyr_type = dplyr_type[pana_ref$R_class]
+pana_ref$pandas_type = pandas_type[pana_ref$R_class]
+
+## ---------------------------------------------------------------------
+pana_ref = pana_ref %>%
     arrange(unique_count) %>%
-    mutate(need_clarification = '', notes = '', pandas_dtype = '') %>%
     select(col_number, col_name, R_class, unique_count,
-           need_clarification, notes, pandas_dtype, unique) %>%
-    write_csv("data_reference.csv")
+           dplyr_type, pandas_type, unique)
 
-
-pana_df %>%
-    select(-RawDataKey, -SessionID) %>%
-    sample_n(10000) %>%
-    naniar::vis_miss()
+write_csv(pana_ref, "data_reference.csv")
