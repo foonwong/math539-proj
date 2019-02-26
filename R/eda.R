@@ -1,16 +1,102 @@
 source("R/data_reader.R")
 library(lubridate)
 library(tidyverse)
-library(leaflet)
 
 data_path = c("data/df_rfp_dataset_raw_20181218185047.csv",
               "data/df_rfp_dataset_raw_20190208223442.csv")
 
-both_dataset = map(data_path, ~data_reader(.x, data_ref = "data_reference.csv"))
-names(both_dataset) = basename(data_path)
+# both_dfs = map(data_path, ~data_reader(.x, data_ref = "data_reference.csv"))
+# names(both_dfs) = basename(data_path)
+df1 = data_reader(data_path[1], "data/data_reference.csv")
 
 
-## Overlap?
+## Distribution -------------------------------------------
+#### Date and time
+
+get_time_distribution_plot = function(df) {
+    list(
+        hour = df1 %>%
+            select(contains("TimeLocal")) %>%
+            mutate_all(hour) %>%
+            gather(var, hour) %>%
+            ggplot(aes(hour)) +
+            geom_histogram(bins=24) +
+            facet_wrap(~var) +
+            labs(title = "Distribution: Local time of day"),
+
+        month = df1 %>%
+            select(DepartureTimeUTC) %>%
+            mutate_all(month) %>%
+            gather(var, month) %>%
+            ggplot(aes(month)) +
+            geom_histogram(bins=12) +
+            facet_wrap(~var) +
+            labs(title = "Distribution: month of year")
+    )
+}
+
+timing_distribution_plots = get_time_distribution_plot(df1)
+
+map2(timing_distribution_plots, names(timing_distribution_plots), {
+    ~ggsave(paste0(.y, ".png") , .x, path = "plots/density_plots")
+})
+
+#### Cateogrical --------------------------------------------------------
+get_bar_plot = function(data, colname) {
+    col_sym = sym(colname)
+
+    data %>%
+        count(!! col_sym) %>%
+        ggplot(aes(fct_reorder(!! col_sym, n), n)) +
+        geom_col() +
+        labs(title = paste("Counts:", colname)) +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+}
+
+factor_cols = colnames(select_if(df1, is.factor))
+factor_bar_plots = map(factor_cols, ~get_bar_plot(df1, .x))
+
+map2(factor_bar_plots, factor_cols, {
+    ~ggsave(paste0(.y, ".png") , .x, path = "plots/bar_plots")
+})
+
+## Using departure time as reference
+map(both_dfs, ~(range(.x$DepartureTimeUTC)))
+
+#### Numeric ------------------------------------------------------
+get_density_plot = function(data, colname) {
+    col_sym = sym(colname)
+
+    data %>%
+        ggplot(aes(!! col_sym)) +
+        geom_density() +
+        labs(title = paste("Density:", colname))
+        # theme(axis.text.x = element_text(angle = 45, hjust = 1))
+}
+
+numeric_cols = df1 %>%
+    select_if(is.numeric) %>%
+    select(-RawDataKey, -contains("ID")) %>%
+    colnames(.)
+
+get_density_plot(df1, numeric_cols[1])
+numeric_density_plots = map(numeric_cols, ~get_density_plot(df1, .x))
+
+map2(numeric_density_plots, numeric_cols, {
+    ~ggsave(
+        filename = paste0(str_remove_all(.y, "/"), ".png"),
+        plot = .x,
+        path = "plots/density_plots"
+    )
+})
+
+
+
+## Univariate_relationships
+
+
+
+## Comparing both datasets ------------
 get_col_intersect = function(df_list, column_name) {
     data = map(df_list, ~.x[[column_name]])
 
@@ -23,63 +109,12 @@ get_col_union = function(df_list, column_name) {
     union(data[[1]], data[[2]])
 }
 
-intersect_list = map(colnames(both_dataset[[1]]), ~get_col_intersect(both_dataset, .x))
-names(intersect_list) = colnames(both_dataset[[1]])
+intersect_list = map(colnames(both_dfs[[1]]), ~get_col_intersect(both_dfs, .x))
+names(intersect_list) = colnames(both_dfs[[1]])
 
-
-## Dates
-## Using departure time as reference
-map(both_dataset, ~(range(.x$DepartureTimeUTC)))
-
-
-## Countries and routes
-orig_country_union = get_col_union(both_dataset, "Orig_Country")
-dest_country_union = get_col_union(both_dataset, "Dest_Country")
-
-all_routes = get_col_union(both_dataset, "Routes")
-route_df = tibble(route = all_routes) %>%
-    separate(route, into = c("orig", "dest"))
-
-unique_airports = unique(c(route_df$orig, route_df$dest))
-
-## Geocoding
-ggmap::register_google(Sys.getenv("GMAP_KEY"))
-
-latlons = ggmap::geocode(country_union)
-country_latlon = tibble(country = country_union) %>%
-    bind_cols(latlons)
-
-airport_info = read_csv("airport.csv")
-airport_info_cols = c(
-    "ident",
-    "name",
-    lat = "latitude_deg",
-    lon = "longitude_deg",
-    country = "iso_country",
-    region = "iso_region"
-)
-
-airport_info = airport_info %>%
-    select(airport_info_cols)
-
-
-airport_lonlat = ggmap::geocode(unique_airports)
-airport_lonlat = tibble(airport = unique_airports) %>%
-    left_join(airport_info, by = c("airport" = "ident"))
-
-write_csv(country_latlon, "country_latlon.csv")
-
-leaflet(airport_lonlat) %>%
-    addCircles(popup = ~paste(name)) %>%
-    addTiles()
-
-
-route_df1 = both_dataset[[1]] %>%
-    distinct(FlightID, Routes)
-
-route_df1 %>%
-    group_by(Routes) %>%
-    summarise(route_weight = length(Routes))
-
-nodes_df1 = str_split(route_df1$Routes, "-", simplify = TRUE) %>%
-
+## Geocoding countries (ran and saved)
+# ggmap::register_google(Sys.getenv("GMAP_KEY"))
+#
+# latlons = ggmap::geocode(country_union)
+# country_latlon = tibble(country = country_union) %>%
+#     bind_cols(latlons)
