@@ -65,13 +65,12 @@ map(both_dfs, ~(range(.x$DepartureTimeUTC)))
 
 #### Numeric ------------------------------------------------------
 get_density_plot = function(data, colname) {
-    col_sym = sym(colname)
+    col_sym = ensym(colname)
 
     data %>%
         ggplot(aes(!! col_sym)) +
         geom_density() +
         labs(title = paste("Density:", colname))
-        # theme(axis.text.x = element_text(angle = 45, hjust = 1))
 }
 
 numeric_cols = df1 %>%
