@@ -9,8 +9,61 @@ data_path = c("data/df_rfp_dataset_raw_20181218185047.csv",
 # names(both_dfs) = basename(data_path)
 df1 = data_reader(data_path[1], "data/data_reference.csv")
 
+df1$UserFlightID = paste(df1$UserID, df1$FlightID)
+
+df1 = df1 %>%
+    right_join(get_take_rate(df1))
+
+userflight_df1 = get_userflight_stats(df1)
+
+## ggplot wrappers ----------------------------------------
+
+get_density_plot = function(data, colname, title_suffix = "NULL") {
+    col_sym = sym(colname)
+
+    data %>%
+        select(!!col_sym) %>%
+        filter(!!col_sym < quantile(!!col_sym, probs = 0.99, na.rm = TRUE)) %>%
+        ggplot(aes(!!col_sym)) +
+        geom_density() +
+        labs(title = paste("Density:", colname, title_suffix))
+}
+
+get_density_plot(df1, "TakeRate")
+
 
 ## Distribution -------------------------------------------
+
+#### Take rate
+take_rate_density = get_density_plot(df1, "TakeRate")
+
+ggsave("plots/density_plots/take_rate.png", take_rate_density,
+       width = 12, height = 8)
+
+#### Per userflight
+userflight_cols = colnames(userflight_df1[, -1])
+
+userflight_den_plot = map(userflight_cols, ~{
+    get_density_plot(userflight_df1, colname = .x,
+                     title_suffix = "per User+Flight (lower 99th percentile)")
+})
+
+map2(userflight_den_plot, userflight_cols, {
+    ~ggsave(
+        filename = paste0(str_remove_all(.y, "/"), ".png"),
+        plot = .x,
+        path = "plots/userflight_density"
+    )
+})
+
+#### DataUsage
+take_rate_density = df1 %>%
+    ggplot(aes(TakeRate)) +
+    geom_density() +
+    labs(title = "Take rate")
+
+
+
 #### Date and time
 
 get_time_distribution_plot = function(df) {
@@ -64,14 +117,6 @@ map2(factor_bar_plots, factor_cols, {
 map(both_dfs, ~(range(.x$DepartureTimeUTC)))
 
 #### Numeric ------------------------------------------------------
-get_density_plot = function(data, colname) {
-    col_sym = sym(colname)
-
-    data %>%
-        ggplot(aes(!! col_sym)) +
-        geom_density() +
-        labs(title = paste("Density:", colname))
-}
 
 numeric_cols = df1 %>%
     select_if(is.numeric) %>%

@@ -1,6 +1,7 @@
-source("R/data_reader.R")
-library(lubridate)
 library(tidyverse)
+library(lubridate)
+source("R/data_reader.R")
+source("R/get_take_rate.R")
 
 data_path = c("data/df_rfp_dataset_raw_20181218185047.csv",
               "data/df_rfp_dataset_raw_20190208223442.csv")
@@ -9,22 +10,8 @@ data_path = c("data/df_rfp_dataset_raw_20181218185047.csv",
 # names(both_dfs) = basename(data_path)
 df1 = data_reader(data_path[1], "data/data_reference.csv")
 
-# Make take_rate ----------------------------------------------------------
-take_rate = df1 %>%
-    group_by(FlightID) %>%
-    summarise(UniquePassenger = length(unique(UserID)),
-              TotalPassengers = mean(TotalPassengers),
-              take_rate = UniquePassenger / TotalPassengers) %>%
-    filter(take_rate <= 1)
-
-df1 = left_join(df1, take_rate)
-
-take_rate_density = take_rate %>%
-    ggplot(aes(take_rate)) +
-    geom_density() +
-    labs(title = "Take rate")
-
-ggsave("plots/density_plots/take_rate.png", take_rate_density)
+df1 = df1 %>%
+    right_join(get_take_rate(df1))
 
 # Correlation -------------------------------------------------------
 library(GGally)

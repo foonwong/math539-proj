@@ -1,0 +1,71 @@
+---
+title: "UserID, SessionID uniqueness"
+author: "Foon Wong"
+date: "February 26, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(include = FALSE, cache = TRUE)
+knitr::opts_knit$set(root.dir = here::here())
+setwd(here::here())
+
+library(tidyverse)
+library(DT)
+source("R/data_reader.R")
+```
+
+
+```{r}
+data_path = c("data/df_rfp_dataset_raw_20181218185047.csv")
+
+multisess_users = read_csv("data/multisession_userID.csv", col_types = 'cd') %>%
+    left_join(data_reader(data_path[1], "data/data_reference.csv"))
+```
+
+## Some users have many sessions
+```{r include=TRUE}
+multisess_users %>%
+    distinct(UserID, SessionCount)
+```
+
+---
+
+```{r}
+check_user = function(uid, data=multisess_users) {
+    data %>%
+        filter(UserID == uid) %>%
+        arrange(SessionStartTime) %>%
+        select(ProductName, SessionStartTime,
+               SessionDurationMinutes, TotalUsageMB, Routes, FlightID)
+}
+```
+
+
+## Checking users with many sessions
+
+#### User 3093
+
+```{r include=TRUE}
+datatable(check_user("3093"))
+```
+
+* Looks like a single person to me
+
+```{r include=TRUE}
+datatable(check_user("42983"))
+```
+
+
+```{r include=TRUE}
+datatable(check_user("61810"))
+```
+
+
+```{r include=TRUE}
+datatable(check_user("5810"))
+```
+
+---
+
+

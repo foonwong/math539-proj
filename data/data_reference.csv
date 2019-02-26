@@ -1,6 +1,6 @@
 col_number,col_name,R_class,unique_count,need_clarification,notes,Response,dplyr_col_type,pandas_dtype,categorical,unique
 1,RawDataKey,numeric,4181546,N,,,n,float64,0,NA
-2,UserID,numeric,1068154,N,,,n,float64,0,NA
+2,UserID,character,1068154,N,,,c,object,0,NA
 3,SessionID,character,4181197,N,,,c,object,0,NA
 4,SessionAccountType,factor,12,Y,Do voucher/tokens cost less to customers?,How they paid.,c,category,1,"COMP-TOKEN, CreditCard, Panasonic, Panasonic - FirstDat, Panasonic - PROD, PayPal, PayPal - PROD, PayPal-PRD, Valor Mileage, Voucher, Voucher+CC, WISP"
 5,ProductName,character,144,N,,,c,object,0,NA
@@ -11,7 +11,7 @@ col_number,col_name,R_class,unique_count,need_clarification,notes,Response,dplyr
 10,SessionDurationMinutes,numeric,2939,N,,,n,float32,0,NA
 11,SessionVolumeUpAmount,numeric,71070,N,,,n,float32,0,NA
 12,SessionVolumeDownAmount,numeric,120729,N,,,n,float32,0,NA
-13,FlightID,numeric,567089,N,,,n,float32,0,NA
+13,FlightID,character,567089,N,,,c,object,0,NA
 14,Airline,factor,23,N,,,c,category,1,"AAL, AAR, AEA, AMX, ANA, ASL, AZA, CPA, CRK, EWG, FIN, IBE, KAC, KLM, MAS, QTR, REU, RWD, SEY, SIA, SWR, THA, WJA"
 15,FlightDurationType,factor,5,N,,,c,category,1,"Long-Haul, Medium-Haul, Short-Haul, Ultra Long-Haul, Ultra Short-Haul"
 16,TailNumber,character,689,N,,,c,category,1,NA
