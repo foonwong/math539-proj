@@ -1,6 +1,5 @@
 library(tidyverse)
 library(leaflet)
-library(htmlwidgets)
 
 ## data ---------------------------------------------------------------------
 
