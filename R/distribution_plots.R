@@ -65,7 +65,7 @@ map(both_dfs, ~(range(.x$DepartureTimeUTC)))
 
 #### Numeric ------------------------------------------------------
 get_density_plot = function(data, colname) {
-    col_sym = ensym(colname)
+    col_sym = sym(colname)
 
     data %>%
         ggplot(aes(!! col_sym)) +
@@ -90,6 +90,12 @@ map2(numeric_density_plots, numeric_cols, {
 })
 
 
+df1 %>%
+    group_by(UserID) %>%
+    summarise(TotalUsageMB = sum(TotalUsageMB)) %>%
+    filter(TotalUsageMB < 5000) %>%
+    ggplot(aes(TotalUsageMB)) +
+    geom_density()
 
 ## Univariate_relationships
 

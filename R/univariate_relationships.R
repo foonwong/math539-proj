@@ -26,10 +26,20 @@ take_rate_density = take_rate %>%
 
 ggsave("plots/density_plots/take_rate.png", take_rate_density)
 
+# Correlation -------------------------------------------------------
+library(GGally)
 
-# Plots ----------------------------------------------------------
+corr_plot = df1 %>%
+    select(-matches("*ID*|*Time*|*Key*", ignore.case = FALSE)) %>%
+    ggcorr(label = TRUE, label_size = 3, label_round = 2, label_alpha = TRUE,
+           hjust = 0.75, layout.exp = 1, size = 2)
+
+ggsave("plots/correlation.png", corr_plot,
+       width = 14, height = 14)
+
+# box Plots ----------------------------------------------------------
 get_tr_boxplot = function(data, colname, take_rate_lim = 1) {
-    col_sym = ensym(colname)
+    col_sym = sym(colname)
 
     data %>%
         select(!!col_sym, take_rate) %>%
@@ -42,6 +52,7 @@ get_tr_boxplot = function(data, colname, take_rate_lim = 1) {
         theme(axis.text.x = element_text(angle = 45, hjust = 1))
 }
 
+
 factor_cols = colnames(select_if(df1, is.factor))
 
 factor_tr_boxplots = map(factor_cols, ~get_tr_boxplot(df1, .x))
@@ -49,11 +60,12 @@ factor_tr_boxplots_025 = map(factor_cols, ~{
     get_tr_boxplot(df1, .x, take_rate_lim = 0.25)
 })
 
+
 map2(factor_tr_boxplots, factor_cols, {
     ~ggsave(
         paste0(.y, ".png"),
         .x,
-        path = "plots/univariate_plots",
+        path = "plots/univar_takerate",
         width = 12, height = 8
     )
 })
@@ -62,7 +74,52 @@ map2(factor_tr_boxplots_025, factor_cols, {
     ~ggsave(
         paste0(.y, "capped.png"),
         .x,
-        path = "plots/univariate_plots/takerate_capped",
+        path = "plots/univar_takerate/capped",
         width = 12, height = 6
     )
 })
+
+
+## datausage
+get_datause_boxplot = function(data, colname) {
+    col_sym = sym(colname)
+
+    data %>%
+        select(UserID, !!col_sym, TotalUsageMB) %>%
+        group_by(UserID, !!col_sym) %>%
+        summarise(TotalUsageMB = sum(TotalUsageMB)) %>%
+        filter(TotalUsageMB < 1000) %>%
+        drop_na() %>%
+        ggplot(aes(fct_reorder(!! col_sym, TotalUsageMB), TotalUsageMB)) +
+        geom_boxplot() +
+        labs(title = paste0(colname, " vs Data Usage(per user, MB)"),
+             x = colname) +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 1))
+}
+
+data_cols = c(
+    "Orig_Country",
+    "Dest_Country"
+   # "Orig_Region",
+   # "FlightDurationType",
+   # "Dest_Region",
+   # "NightFlight",
+   # "Category",
+   # "Airline_Region",
+   # "AC Frame",
+   # "luxury"
+)
+
+
+for (col in data_cols) {
+    p = get_datause_boxplot(df1, col)
+
+    ggsave(
+        paste0(col, "_datausage_capped1GB.png"),
+        p,
+        path = "plots/univar_datausage",
+        width = 12, height = 8
+    )
+
+    gc()
+}
