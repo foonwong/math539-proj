@@ -15,10 +15,11 @@ df1 = df1 %>%
     right_join(get_take_rate(df1))
 
 userflight_df1 = get_userflight_stats(df1)
+flight_stats_df1 = get_flight_stats(df1)
 
 ## ggplot wrappers ----------------------------------------
 
-get_density_plot = function(data, colname, title_suffix = "NULL") {
+get_density_plot = function(data, colname, title_suffix = NULL) {
     col_sym = sym(colname)
 
     data %>%
@@ -28,8 +29,6 @@ get_density_plot = function(data, colname, title_suffix = "NULL") {
         geom_density() +
         labs(title = paste("Density:", colname, title_suffix))
 }
-
-get_density_plot(df1, "TakeRate")
 
 
 ## Distribution -------------------------------------------
@@ -52,15 +51,11 @@ map2(userflight_den_plot, userflight_cols, {
     ~ggsave(
         filename = paste0(str_remove_all(.y, "/"), ".png"),
         plot = .x,
-        path = "plots/userflight_density"
+        path = "plots/userflight_density",
+        widht = 12, height = 6
     )
 })
 
-#### DataUsage
-take_rate_density = df1 %>%
-    ggplot(aes(TakeRate)) +
-    geom_density() +
-    labs(title = "Take rate")
 
 
 

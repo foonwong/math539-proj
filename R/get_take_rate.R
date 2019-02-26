@@ -59,3 +59,18 @@ get_userflight_stats = function(df) {
             SessionDurationMin_perc = SessionDurationMin_total / sum(TimeAllowance_min)
         )
 }
+
+get_flight_stats = function(df) {
+    # Requires unique UserFlightID key
+    # Returns dataframe
+
+    df %>%
+        group_by(FlightID) %>%
+        summarise(
+            DataUsage_total = sum(TotalUsageMB),
+            DataUsage_perc = DataUsage_total / sum(DataAllowance),
+            Spending_total = sum(`Price/USD`),
+            Session_count = n(),
+            SessionDurationMin_perc = SessionDurationMin_total / sum(TimeAllowance_min)
+        )
+}
