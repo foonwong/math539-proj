@@ -65,12 +65,15 @@ get_flight_stats = function(df) {
     # Returns dataframe
 
     df %>%
+        left_join(get_data_time_allowance_df(df)) %>%
         group_by(FlightID) %>%
         summarise(
             DataUsage_total = sum(TotalUsageMB),
             DataUsage_perc = DataUsage_total / sum(DataAllowance),
             Spending_total = sum(`Price/USD`),
             Session_count = n(),
+            SessionDurationMin_total = sum(SessionDurationMinutes),
+            SessionDurationMin_mean = mean(SessionDurationMinutes),
             SessionDurationMin_perc = SessionDurationMin_total / sum(TimeAllowance_min)
         )
 }

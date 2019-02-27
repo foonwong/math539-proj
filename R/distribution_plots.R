@@ -17,6 +17,7 @@ df1 = df1 %>%
 userflight_df1 = get_userflight_stats(df1)
 flight_stats_df1 = get_flight_stats(df1)
 
+
 ## ggplot wrappers ----------------------------------------
 
 get_density_plot = function(data, colname, title_suffix = NULL) {
@@ -33,11 +34,28 @@ get_density_plot = function(data, colname, title_suffix = NULL) {
 
 ## Distribution -------------------------------------------
 
-#### Take rate
+#### Per flight ------------------------------------------
 take_rate_density = get_density_plot(df1, "TakeRate")
 
 ggsave("plots/density_plots/take_rate.png", take_rate_density,
        width = 12, height = 8)
+
+
+perflight_cols = colnames(flight_stats_df1[, -1])
+perflight_den_plot = map(perflight_cols, ~{
+    get_density_plot(flight_stats_df1, colname = .x,
+                     title_suffix = "per Flight (lower 99th percentile)")
+})
+
+map2(perflight_den_plot, perflight_cols, {
+    ~ggsave(
+        filename = paste0(str_remove_all(.y, "/"), ".png"),
+        plot = .x,
+        path = "plots/per_flight_density",
+        width = 12, height = 8
+    )
+})
+
 
 #### Per userflight
 userflight_cols = colnames(userflight_df1[, -1])
@@ -52,7 +70,7 @@ map2(userflight_den_plot, userflight_cols, {
         filename = paste0(str_remove_all(.y, "/"), ".png"),
         plot = .x,
         path = "plots/userflight_density",
-        widht = 12, height = 6
+        width = 12, height = 6
     )
 })
 
@@ -129,34 +147,22 @@ map2(numeric_density_plots, numeric_cols, {
     )
 })
 
-
-df1 %>%
-    group_by(UserID) %>%
-    summarise(TotalUsageMB = sum(TotalUsageMB)) %>%
-    filter(TotalUsageMB < 5000) %>%
-    ggplot(aes(TotalUsageMB)) +
-    geom_density()
-
-## Univariate_relationships
-
-
-
-## Comparing both datasets ------------
-get_col_intersect = function(df_list, column_name) {
-    data = map(df_list, ~.x[[column_name]])
-
-    intersect(data[[1]], data[[2]])
-}
-
-get_col_union = function(df_list, column_name) {
-    data = map(df_list, ~.x[[column_name]])
-
-    union(data[[1]], data[[2]])
-}
-
-intersect_list = map(colnames(both_dfs[[1]]), ~get_col_intersect(both_dfs, .x))
-names(intersect_list) = colnames(both_dfs[[1]])
-
+# ## Comparing both datasets ------------
+# get_col_intersect = function(df_list, column_name) {
+#     data = map(df_list, ~.x[[column_name]])
+#
+#     intersect(data[[1]], data[[2]])
+# }
+#
+# get_col_union = function(df_list, column_name) {
+#     data = map(df_list, ~.x[[column_name]])
+#
+#     union(data[[1]], data[[2]])
+# }
+#
+# intersect_list = map(colnames(both_dfs[[1]]), ~get_col_intersect(both_dfs, .x))
+# names(intersect_list) = colnames(both_dfs[[1]])
+#
 ## Geocoding countries (ran and saved)
 # ggmap::register_google(Sys.getenv("GMAP_KEY"))
 #

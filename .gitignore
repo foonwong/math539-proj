@@ -2,5 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+**cache**
 **df_rfp_dataset_raw*.csv
 **userflight*.csv
+**flight_stats*.csv
