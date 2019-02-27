@@ -1,5 +1,6 @@
 library(tidyverse)
 library(leaflet)
+library(geosphere)
 
 ## data ---------------------------------------------------------------------
 
