@@ -1,6 +1,8 @@
 .Rproj.user
 .Rhistory
-.RData
+**.RData
+**.rdb
+**.rdx
 .Ruserdata
 cache
 **df_rfp_dataset_raw*.csv
