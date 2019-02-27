@@ -75,5 +75,6 @@ get_flight_stats = function(df) {
             SessionDurationMin_total = sum(SessionDurationMinutes),
             SessionDurationMin_mean = mean(SessionDurationMinutes),
             SessionDurationMin_perc = SessionDurationMin_total / sum(TimeAllowance_min)
-        )
+        ) %>%
+        left_join(get_take_rate_df(df))
 }
