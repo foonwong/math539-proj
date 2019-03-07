@@ -1,6 +1,6 @@
 library(tidyverse)
+library(sf)
 library(leaflet)
-library(geosphere)
 
 ## data ---------------------------------------------------------------------
 
@@ -24,17 +24,13 @@ airport_info_cols = c(
     region = "iso_region"
 )
 
-airport_info = read_csv("data/airport.csv") %>%
+airport_info = read_csv("data/airport_info.csv") %>%
     select(airport_info_cols)
 
 ## leaflet ---------------------------------------------------------------------
 
 make_flight_network = function(route_df, airport_info_df) {
     airport_coord = airport_info_df[c('ICAO', 'lat', 'lon')]
-
-    get_coord = function(iaco_code, airport_info) {
-        filter(airport_info, ICAO == iaco_code)[c('lat', 'lon')]
-    }
 
     route_edge = route_df %>%
         mutate_all(as.character) %>%
@@ -63,7 +59,7 @@ make_flight_network = function(route_df, airport_info_df) {
     weight_pal = cut(route_edge$edge_weight, 11, labels = F)
 
     leaflet(route_node) %>%
-        addTiles() %>%
+        addProviderTiles(providers$CartoDB.DarkMatter) %>%
         addPolylines(
             lat = ~c(lat.x, lat.y), lng = ~c(lon.x, lon.y),
             data = route_edge,
@@ -81,3 +77,12 @@ make_flight_network = function(route_df, airport_info_df) {
             popup = ~paste0(name, "; flights: ", node_weight)
         )
 }
+
+
+## ----------------------------------------------------
+
+# leaflet_flight_nets = map(route_dfs, ~make_flight_network(.x, airport_info))
+#
+# map2(leaflet_flight_nets, names(leaflet_flight_nets), {
+#     htmlwidgets::saveWidget(.x, file = paste0(.y, ".html"), selfcontained = TRUE)
+# })
