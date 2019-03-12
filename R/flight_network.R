@@ -1,3 +1,6 @@
+# NEED TO FIX
+# WEIGHTED CURRENTLY BY # OF SESSIONS
+
 library(tidyverse)
 library(sf)
 library(leaflet)
@@ -9,7 +12,8 @@ data_paths = c("data/df_rfp_dataset_raw_20181218185047.csv",
                "data/df_rfp_dataset_raw_20190208223442.csv")
 
 route_dfs = map(data_paths, {
-    ~read_csv(.x, col_types = cols_only(Routes = "c"))
+    ~read_csv(.x, col_types = cols_only(Routes = "c"),
+              n_max = 5)
 })
 
 names(route_dfs) = basename(data_paths)
