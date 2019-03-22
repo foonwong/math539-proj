@@ -1,4 +1,5 @@
 source("R/data_reader.R")
+source("R/get_take_rate.R")
 library(lubridate)
 library(tidyverse)
 
@@ -7,12 +8,10 @@ data_path = c("data/df_rfp_dataset_raw_20181218185047.csv",
 
 # both_dfs = map(data_path, ~data_reader(.x, data_ref = "data_reference.csv"))
 # names(both_dfs) = basename(data_path)
-df1 = data_reader(data_path[1], "data/data_reference.csv")
+df1 = data_reader(data_path[1], "data/data_reference.csv", nrows = 10000)
+df2 = data_reader(data_path[2], "data/data_reference.csv")
 
 df1$UserFlightID = paste(df1$UserID, df1$FlightID)
-
-df1 = df1 %>%
-    right_join(get_take_rate(df1))
 
 userflight_df1 = get_userflight_stats(df1)
 flight_stats_df1 = get_flight_stats(df1)

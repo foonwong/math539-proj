@@ -6,8 +6,8 @@ col_number,col_name,R_class,unique_count,need_clarification,notes,Response,dplyr
 5,ProductName,character,144,N,,,c,object,0,NA
 6,PaymentCardType,factor,10,N,,,c,category,1,"AMEX, CUP, DC, DISC, JCB, MC, NotApplicable, Unknown, VISA"
 7,DeviceTypes,factor,17,N,,,c,category,1,"laptop, laptop,mobile, laptop,mobile,tablet, laptop,tablet, laptop,tablet,mobile, mobile, mobile,laptop, mobile,laptop,tablet, mobile,tablet, mobile,tablet,laptop, tablet, tablet,laptop, tablet,laptop,mobile, tablet,mobile, tablet,mobile,laptop, UNKNOWN"
-8,SessionStartTime,"POSIXct, POSIXt",4010759,N,,,T,category,0,NA
-9,SessionEndTime,"POSIXct, POSIXt",3667425,N,,,T,category,0,NA
+8,SessionStartTime,"POSIXct, POSIXt",4010759,N,,,T,object,0,NA
+9,SessionEndTime,"POSIXct, POSIXt",3667425,N,,,T,object,0,NA
 10,SessionDurationMinutes,numeric,2939,N,,,n,float32,0,NA
 11,SessionVolumeUpAmount,numeric,71070,N,,,n,float32,0,NA
 12,SessionVolumeDownAmount,numeric,120729,N,,,n,float32,0,NA
@@ -18,10 +18,10 @@ col_number,col_name,R_class,unique_count,need_clarification,notes,Response,dplyr
 17,AircraftType,factor,28,N,,,c,category,1,"319-100, 320-100, 320-200, 320-230, 321-100, 321-200, 330-200, 330-220, 330-240, 330-300, 340-300, 350-1000, 350-900, 737-700, 737-800, 737-MAX8, 757-200, 767-300, 767-300ER, 777-200, 777-200ER, 777-220, 777-240, 777-300, 777-300ER, 787-10, 787-8, 787-9"
 18,OriginIATA,character,452,N,,,c,category,1,NA
 19,DestinationIATA,character,439,N,,,c,category,1,NA
-20,DepartureTimeUTC,"POSIXct, POSIXt",430356,N,,,T,category,0,NA
-21,LandingTimeUTC,"POSIXct, POSIXt",434820,N,,,T,category,0,NA
-22,DepartureTimeLocal,"POSIXct, POSIXt",394609,N,,,T,category,0,NA
-23,LandingTimeLocal,"POSIXct, POSIXt",400013,N,,,T,category,0,NA
+20,DepartureTimeUTC,"POSIXct, POSIXt",430356,N,,,T,object,0,NA
+21,LandingTimeUTC,"POSIXct, POSIXt",434820,N,,,T,object,0,NA
+22,DepartureTimeLocal,"POSIXct, POSIXt",394609,N,,,T,object,0,NA
+23,LandingTimeLocal,"POSIXct, POSIXt",400013,N,,,T,object,0,NA
 24,FlightDurationHrs,numeric,1076,N,,,n,float16,0,NA
 25,AntennaType,factor,5,Y,Any more on cost to panasonic?,How would you use that? I dont have that information,c,category,1,"C: Commerc, DPA-02, Melco, SPA-01"
 26,Orig_Country,factor,137,N,,,c,category,1,NA
