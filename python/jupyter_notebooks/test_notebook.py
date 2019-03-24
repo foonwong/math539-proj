@@ -1,29 +1,49 @@
 #%%
-sys.path.append('python/wifipricing')
-for p in sys.path:
-    print(p)
-
+sys.path.append('python')
 
 #%%
+import importlib
 import re
 import numpy as np
-import data_reader
-import importlib
-importlib.reload(data_reader)
+import pandas as pd
+import wifipricing.data_reader
+importlib.reload(wifipricing.data_reader)
+from wifipricing.data_reader import data_reader
+
+# #%%
+# wifi_products_df = data_reader(
+#     "data/df_rfp_dataset_raw_20181218185047.csv",
+#     "data/data_reference.csv",
+#     usecols=['ProductName']
+# )
+
+# #%%
+# wifi_products_df.astype(str). \
+#     groupby(['ProductName', 'DataCap_MB', 'TimeCap_min']). \
+#     size()
+
 
 #%%
-wifi_df = data_reader.data_reader(
+wifi_takerate_df = data_reader(
     "data/df_rfp_dataset_raw_20181218185047.csv",
     "data/data_reference.csv",
-    usecols=['ProductName'],
-    nrows=100000
-)
+    usecols=['FlightID', 'TotalPassengers'],
+    nrows=5000
+) 
+
+wifi_takerate_df.head()
 
 #%%
-wifi_df
+tr_df.head()
 
 #%%
-wifi_df.dtypes
+pd.merge(wifi_takerate_df, tr_df, )
+
 
 #%%
-wifi_df['ProductName'].map(lambda x: datacap[x]).unique()
+
+pd.merge(wifi_takerate_df, tr_df, on='FlightID').groupby(['FlightID', 'TakeRate_overall']).size()
+
+#%%
+
+#%%

@@ -12,12 +12,25 @@ def data_reader(data, data_dict, nrows=None, usecols=None):
     timecols = [x for x in df.columns if 'Time' in x]
     df[timecols] = df[timecols].astype('datetime64')
 
-    prod_nm = df['ProductName'].unique()
-    datacap_dict = {x:get_datacap(x) for x in prod_nm}
-    timecap_dict = {x:get_timecap(x) for x in prod_nm}
+    if 'ProductName' in df.columns: 
+        prod_nm = df['ProductName'].unique()
+        datacap_dict = {x:get_datacap(x) for x in prod_nm}
+        timecap_dict = {x:get_timecap(x) for x in prod_nm}
 
-    df['DataCap_MB'] = df['ProductName'].map(lambda x: datacap_dict[x])
-    df['TimeCap_min'] = df['ProductName'].map(lambda x: timecap_dict[x])
+        df['DataCap_MB'] = df['ProductName'].map(lambda x: datacap_dict[x])
+        df['TimeCap_min'] = df['ProductName'].map(lambda x: timecap_dict[x])
+    
+    try:
+        tr_df = get_takerate_overall(df)
+        df = pd.merge(df, tr_df, on=['FlightID', 'TotalPassengers'], how='left')
+    except:
+        pass
+
+    # try:
+    #     tr_df = get_takerate_category(df)
+    #     df = pd.merge(df, tr_df, on=['FlightID', 'TotalPassengers', 'Category'], how='left')
+    # except:
+    #     pass
 
     return df
 
@@ -49,6 +62,19 @@ def get_timecap(x):
     return data
 
 
-def get_takerate(df):
+def get_takerate_overall(df):
+    """Returns overall wifi takerate per FlightID"""
+    tr_df = df.\
+        groupby(['FlightID', 'TotalPassengers']).size().reset_index().rename(columns={0:'TotalSessions'}).\
+        assign(TakeRate_overall=lambda x: x['TotalSessions'] / x['TotalPassengers'])
 
-    return None
+    return tr_df
+
+
+def get_takerate_category(df):
+    """Returns overall wifi takerate per FlightID"""
+    tr_df = df.\
+        groupby(['FlightID', 'TotalPassengers', 'Category']).size().reset_index().rename(columns={0:'TotalSessionsCat'}).\
+        assign(TakeRate_overall=lambda x: x['TotalSessionsCat'] / x['TotalPassengers'])
+
+    return tr_df

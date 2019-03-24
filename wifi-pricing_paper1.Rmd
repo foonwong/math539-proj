@@ -1,10 +1,17 @@
 ---
-title: "A machine learning framework for inflight WiFi pricing optimization"
-author: "Foon Wong, Romain Drai"
+title: "In-flight Wifi Pricing Optimization"
+subtitle: | 
+    | California State University, Fullerton
+    | In collaboration with Panasonic and Black Swan Data
+author:
+    Romain Drai, Tin Huynh, James Luo, Shan Jiang, Jessica Shin, Foon Wong, Tingting Xu
 date: "March 14, 2019"
 output: pdf_document
 header-includes:
-- \usepackage{amsmath,amssymb}
+  - \usepackage{titling}
+  - \pretitle{\begin{center}\LARGE\includegraphics[width=2cm]{csuflogo.png}\\[\bigskipamount]}
+  - \posttitle{\end{center}}
+  - \usepackage{amsmath,amssymb}
 ---
 
 ```{r setup, include=FALSE}
