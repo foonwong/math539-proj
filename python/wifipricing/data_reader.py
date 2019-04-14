@@ -5,24 +5,32 @@ def data_reader(data, data_dict, nrows=None, usecols=None):
     """reading in wifi data as pandas.DataFrame"""
 
     ref = pd.read_csv(data_dict)
-    type_dict = {k:v for k,v in zip(ref['col_name'], ref['pandas_dtype'])}
 
-    df = pd.read_csv(data, dtype=type_dict, nrows=nrows, usecols=usecols)
+    pd_nm = ref['pandas_name']
+    type_dict = {k:v for k,v in zip(pd_nm, ref['pandas_dtype'])}
 
-    timecols = [x for x in df.columns if 'Time' in x]
+    # df = pd.read_csv(data, names = pd_nm, dtype=type_dict, nrows=nrows, usecols=usecols)
+    df = pd.read_csv(
+        data, 
+        names = pd_nm, header=1, 
+        nrows=nrows, usecols=usecols,
+        dtype = type_dict
+    )
+
+    timecols = [x for x in df.columns if 'time' in x]
     df[timecols] = df[timecols].astype('datetime64')
 
-    if 'ProductName' in df.columns: 
-        prod_nm = df['ProductName'].unique()
+    if 'product_name' in df.columns: 
+        prod_nm = df['product_name'].unique()
         datacap_dict = {x:get_datacap(x) for x in prod_nm}
         timecap_dict = {x:get_timecap(x) for x in prod_nm}
 
-        df['DataCap_MB'] = df['ProductName'].map(lambda x: datacap_dict[x])
-        df['TimeCap_min'] = df['ProductName'].map(lambda x: timecap_dict[x])
+        df['datacap_mb'] = df['product_name'].map(lambda x: datacap_dict[x])
+        df['timecap_min'] = df['product_name'].map(lambda x: timecap_dict[x])
     
     try:
         tr_df = get_takerate_overall(df)
-        df = pd.merge(df, tr_df, on=['FlightID', 'TotalPassengers'], how='left')
+        df = pd.merge(df, tr_df, on=['flight_id', 'total_passengers'], how='left')
     except:
         pass
 
@@ -32,7 +40,7 @@ def data_reader(data, data_dict, nrows=None, usecols=None):
     # except:
     #     pass
 
-    return df
+    return df 
 
 
 def get_datacap(x):
