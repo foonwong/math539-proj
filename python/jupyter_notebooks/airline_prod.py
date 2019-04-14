@@ -1,9 +1,5 @@
 #%%
-import os
-# sys.path.append('python')
-
-os.listdir('python')
-os.listdir('python/wifipricing')
+sys.path.append('python')
 
 #%%
 import importlib
@@ -13,18 +9,21 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-#%%
-importlib.reload(wifipricing.data_reader)
-import wifipricing.data_reader
-from wifipricing.data_reader import data_reader
-from wifipricing.data_reader import get_flight_summary
-from wifipricing.data_reader import get_product_summary
-
 sns.set(color_codes=True)
 
 #%%
 pd.set_option('display.max_columns', 999)
-pd.set_option('display.max_rows', 100) 
+pd.set_option('display.max_rows', 10) 
+
+
+#%%
+import wifipricing.data_reader
+importlib.reload(wifipricing.data_reader)
+from wifipricing.data_reader import data_reader
+from wifipricing.data_reader import get_flight_summary
+from wifipricing.data_reader import get_product_summary
+from wifipricing.data_reader import get_profit
+
 
 #%%
 colnames_wifi = data_reader(
@@ -40,31 +39,45 @@ colnames_wifi
 df_price_cap = data_reader(
     "data/df_rfp_dataset_raw_20181218185047.csv",
     "data/data_reference.csv",
-    usecols=['flight_id', 'routes', 'airline', 'price_usd', 'product_name', 'total_usage_mb']
+    # nrows=5000,
+    usecols=['flight_id', 'routes', 'airline', 'price_usd', 'total_passengers',
+             'product_name', 'total_usage_mb'],
 )
-
-df_price_cap = df_price_cap.\
-    assign(price_per_mb = lambda x: x['datacap_mb']/ x['price_usd'])
-
 
 #%%
 df_price_cap
 
 #%%
-p_price_data = sns.jointplot(
-    x='price_usd', y='total_usage_mb', 
-    kind='kde',
-    xlim=(0,40),
-    ylim=(0,600),
-    # color='DataCap_MB', kind='hex',
-    data=df_price_cap.sample(10000)
- )
+df_price_cap.quantile(0.98)
 
 #%%
 prop_1gb = round(sum(df_price_cap.total_usage_mb > 1000) / df_price_cap.shape[0] * 100, 
     ndigits=2)
 
 print(f"Only {prop_1gb}% of customers use more than 1GB of data ")
+
+
+#%% [markdown]
+# ## First get a sense of the distribution of product pricing/data usage
+# 2. apply filter 
+# 3. Make product summary
+
+#%% [markdown]
+# ## First get a sense of the distribution of product pricing/data usage
+
+#%%
+sns.pairplot(df_price_cap[['total_usage_mb', 'price_usd', 'datacap_mb', 
+                           'timecap_min', 'price_per_mb', 'profit']].sample(1000))
+
+#%%
+sns.jointplot(
+    x='price_usd', y='total_usage_mb', 
+    kind='kde',
+    xlim=(0,40),
+    ylim=(0,900),
+    data=df_price_cap.sample(10000)
+ )
+
 
 #%%
 price_levels = df_price_cap.groupby(['price_usd', 'product_name']).size().shape[0]
@@ -79,17 +92,15 @@ print(f'{data_levels} / {price_levels} ({capped_perc}%) of price/product combo h
 print(f'{not_nulls} / {df_price_cap.shape[0]} ({capped_ses}%) of sessions have datacap')
 
 
-print(f"Only {prop_1gb}% of customers use more than 1GB of data ")
-
-#%% [markdown]
-## Distributions
-
 #%%
+##Distributions
 p = sns.distplot(df_price_cap['price_per_mb'].dropna(), )
 p.axes.set_title('Distribution of price per MB')
 
 #%%
-df_price_cap.groupby('airline').size().sort_values().plot(kind='bar')
+##profit per session
+sns.distplot(df_price_cap.query('total_usage_mb < 1200')['profit'])
+
 
 #%%
 # number of products per airline-route
@@ -98,12 +109,31 @@ p = df_price_cap.groupby(['airline', 'routes', 'product_name']).size().\
 
 p.axes.set_title('Number of products per airline-route (All)')
 
+
 #%%
 df_price_cap.query('datacap_mb > 0').\
     groupby(['airline', 'routes', 'product_name']).size().\
     reset_index().groupby(['airline', 'routes']).size().plot(kind='hist')
 
 p.axes.set_title('Number of products per airline-route (Product with datacap)')
+
+
+#%%
+# number of products per flight 
+p = df_price_cap.groupby(['flight_id', 'product_name']).size().\
+    reset_index().groupby(['flight_id']).size().plot(kind='hist', bins=6)
+
+p.axes.set_title('Number of products per flight (All)')
+
+
+#%%
+# number of products per flight (with cap)
+p = df_price_cap.query('datacap_mb > 0').\
+    groupby(['flight_id', 'product_name']).size().\
+    reset_index().groupby(['flight_id']).size().plot(kind='hist', bins=6)
+
+p.axes.set_title('Number of products per airline-route (Product with datacap)')
+
 
 #%%
 df_price_cap.query('timecap_min > 0').\
@@ -144,6 +174,17 @@ p = sns.jointplot(
  )
 
 p.fig.suptitle('Distribution of product pricing vs price per MB')
+
+#%%
+p = sns.jointplot(
+    x='price_per_mb', y='profit', 
+    kind='kde',
+    xlim=(0, 30),
+    ylim=(-10,30),
+    data=df_price_cap.sample(10000)
+ )
+
+p.fig.suptitle('Distribution of price per MB vs profit per session')
 
 
 #%%
@@ -196,25 +237,24 @@ df_price_cap.columns
 
 
 #%%
-importlib.reload(wifipricing.data_reader)
-from wifipricing.data_reader import data_reader
-from wifipricing.data_reader import get_flight_summary
-from wifipricing.data_reader import get_product_summary
-
-df_test = data_reader(
-    "data/df_rfp_dataset_raw_20181218185047.csv",
-    "data/data_reference.csv",
-    usecols=['flight_id', 'product_name', 'price_usd', 'total_usage_mb'],
-    nrows=15
-)
-
-#%%
-df_test
 
 
 #%%
-get_product_summary(df_test).shape
 
+
+#%%
+def distinct(df, cols):
+    "similar to dplyr's distinct"
+
+    df = df.groupby(cols).size().reset_index().\
+        drop(columns=0)
+
+    return df
+
+
+
+#%%
+distinct(df_price_cap.sample(1000), ['flight_id', 'product_name', 'total_passengers'])
 
 #%%
 

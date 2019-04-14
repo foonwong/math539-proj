@@ -36,6 +36,16 @@ def flight_df_add_features(df):
     except:
         pass
 
+    try:
+        df['price_per_mb'] = df['total_usage_mb'] / df['price_usd']
+    except:
+        pass
+
+    try:
+        df['profit'] = get_profit(df['price_usd'], df['total_usage_mb']) 
+    except:
+        pass
+
     return df
 
 
@@ -66,19 +76,24 @@ def get_flight_summary(df_detailed):
 
 def get_product_summary(df_detailed):
     """Summarizing wifi dataframe for a flight level analysis""" 
-    df = df_detailed.groupby(['flight_id', 'product_name']).size().reset_index().drop(columns=0)
+    ness_cols = ['flight_id', 'product_name', 'total_passengers']
 
+    # Do a dynamic list next to accomodte other accetable columns
+    df = distinct(df_detailed, ness_cols)
+   
     try:
-        df_du = get_product_data_mb(df_detailed)
-        df = pd.merge(df, df_du, on=['flight_id', 'product_name'], how='left')
+        df_du = get_data_per_psn(df_detailed)
+        df = pd.merge(df, df_du, on=['flight_id', 'product_name', 'total_passengers'], how='left')
     except:
         pass
 
     try:
-        df_rev = get_product_revenue(df_detailed)
+        df_rev = get_rev_per_psn(df_detailed)
         df = pd.merge(df, df_rev, on=['flight_id', 'product_name'], how='left')
     except:
         pass
+
+    df = flight_df_add_features(df)
 
     return df
 
@@ -86,13 +101,24 @@ def get_product_summary(df_detailed):
 def get_datacap(x):
     """Extract data cap in MB from productname"""
     data = re.search('(?i)[\d]+(?= ?MB)', x)
-    
+
     try:
         data =  float(data.group())
     except:
         data = None
 
     return data
+
+
+def get_profit(revenue, data_mb, cost_per_mb = 0.05):
+    """Calculate profit from revenue and data usage"""
+    try:
+        prof = revenue - data_mb * cost_per_mb 
+    except:
+        prof = None
+
+    return prof
+
 
 
 def get_timecap(x):
@@ -135,25 +161,29 @@ def get_flight_data_mb(df):
     return df_du
 
 
-def get_product_revenue(df):
-    "Returns overall revenue per FlightID"
-    df_rev = df.groupby(['flight_id', 'product_name'])['price_usd'].sum().\
-        reset_index().rename(columns={'price_usd':'product_revenue_usd'})
+def get_rev_per_psn(df):
+    "Returns revenue per product per head"
+    df_rev = df.groupby(['flight_id', 'product_name', 'total_passengers'])['price_usd'].sum().\
+        reset_index().\
+        assign(revenue_per_psn = lambda x: x['price_usd'] / x['total_passengers']).\
+        drop(columns=['price_usd', 'total_passengers'])
 
     return df_rev
 
 
-def get_product_data_mb(df):
-    """Returns overall datausage per FlightID"""
-    df_du = df.groupby(['flight_id', 'product_name'])['total_usage_mb'].sum().\
-        reset_index().rename(columns={'total_usage_mb':'product_data_mb'})
+def get_data_per_psn(df):
+    """Returns overall datausage per product per head on a flight"""
+    df_du = df.groupby(['flight_id', 'product_name', 'total_passengers'])['total_usage_mb'].sum().\
+        reset_index().rename(columns={'total_usage_mb':'data_per_psn'}).\
+        assign(data_per_psn = lambda x: x['data_per_psn'] / x['total_passengers'])
 
     return df_du
 
-# def get_takerate_category(df):
-#     """Returns overall wifi takerate per FlightID"""
-#     tr_df = df.\
-#         groupby(['FlightID', 'TotalPassengers', 'Category']).size().reset_index().rename(columns={0:'TotalSessionsCat'}).\
-#         assign(TakeRate_overall=lambda x: x['TotalSessionsCat'] / x['TotalPassengers'])
 
-#     return tr_df
+def distinct(df, cols):
+    "similar to dplyr's distinct"
+
+    df = df.groupby(cols).size().reset_index().\
+        drop(columns=0)
+
+    return df
