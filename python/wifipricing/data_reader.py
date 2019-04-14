@@ -37,7 +37,7 @@ def flight_df_add_features(df):
         pass
 
     try:
-        df['price_per_mb'] = df['total_usage_mb'] / df['price_usd']
+        df['price_per_mb'] = df['datacap_mb'] / df['price_usd']
     except:
         pass
 
@@ -76,7 +76,7 @@ def get_flight_summary(df_detailed):
 
 def get_product_summary(df_detailed):
     """Summarizing wifi dataframe for a flight level analysis""" 
-    ness_cols = ['flight_id', 'product_name', 'total_passengers']
+    ness_cols = ['flight_id', 'product_name', 'total_passengers', 'price_usd', 'price_per_mb']
 
     # Do a dynamic list next to accomodte other accetable columns
     df = distinct(df_detailed, ness_cols)
@@ -93,7 +93,12 @@ def get_product_summary(df_detailed):
     except:
         pass
 
-    df = flight_df_add_features(df)
+    try:
+        df['profit_per_psn'] = get_profit(df['revenue_per_psn'], df['data_per_psn'])
+    except:
+        pass
+
+    df = flight_df_add_features(df) 
 
     return df
 

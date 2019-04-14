@@ -22,7 +22,7 @@ importlib.reload(wifipricing.data_reader)
 from wifipricing.data_reader import data_reader
 from wifipricing.data_reader import get_flight_summary
 from wifipricing.data_reader import get_product_summary
-from wifipricing.data_reader import get_profit
+from wifipricing.data_reader import distinct
 
 
 #%%
@@ -39,7 +39,6 @@ colnames_wifi
 df_price_cap = data_reader(
     "data/df_rfp_dataset_raw_20181218185047.csv",
     "data/data_reference.csv",
-    # nrows=5000,
     usecols=['flight_id', 'routes', 'airline', 'price_usd', 'total_passengers',
              'product_name', 'total_usage_mb'],
 )
@@ -254,9 +253,42 @@ def distinct(df, cols):
 
 
 #%%
-distinct(df_price_cap.sample(1000), ['flight_id', 'product_name', 'total_passengers'])
+df_prod_summary = df_price_cap.\
+    query('total_usage_mb < 1200').\
+    query('price_per_mb < 25').\
+    query('price_usd < 65').\
+    pipe(get_product_summary)
 
 #%%
+df_prod_summary
 
+#%%
+prod_quantile = df_prod_summary.quantile(.99)
+prod_quantile
+
+
+#%%
+sns.pairplot(df_prod_summary[prod_quantile.index].sample(5000))
+
+#%%
+sns.jointplot(
+    x='datacap_mb', y='profit_per_psn',
+    kind='kde',
+    data=df_prod_summary.sample(50000)
+)
+
+#%%
+# It doesn't happen often, but sometimes there are multiple prices for the
+# same product per flight
+
+hmm = distinct(df_prod_summary, ['flight_id', 'product_name', 'price_per_mb']).\
+    groupby(['flight_id', 'product_name']).size().reset_index().\
+    rename(columns={0:"counts"}).\
+    sort_values(by=['counts'], ascending=False).\
+    query('counts > 1')
+
+
+#%%
+pd.merge(hmm, df_price_cap, how='left')
 
 #%%
