@@ -10,21 +10,23 @@ import importlib
 import re
 import numpy as np
 import pandas as pd
-import wifipricing.data_reader
-from wifipricing.data_reader import data_reader
 import seaborn as sns
 import matplotlib.pyplot as plt
+
+#%%
+importlib.reload(wifipricing.data_reader)
+import wifipricing.data_reader
+from wifipricing.data_reader import data_reader
+from wifipricing.data_reader import get_flight_summary
+from wifipricing.data_reader import get_product_summary
 
 sns.set(color_codes=True)
 
 #%%
 pd.set_option('display.max_columns', 999)
-pd.set_option('display.max_rows', 10) 
+pd.set_option('display.max_rows', 100) 
 
 #%%
-importlib.reload(wifipricing.data_reader)
-from wifipricing.data_reader import data_reader
-
 colnames_wifi = data_reader(
     "data/df_rfp_dataset_raw_20181218185047.csv",
     "data/data_reference.csv",
@@ -33,23 +35,6 @@ colnames_wifi = data_reader(
 
 colnames_wifi
 
-#%%
-# df_airline_prod = data_reader(
-#     "data/df_rfp_dataset_raw_20181218185047.csv",
-#     "data/data_reference.csv",
-#     usecols=['Price/USD', 'Airline', 'ProductName']
-# ) 
-
-# df_airline_prod.head(10)
-
-# #%%
-# df_airline_prod.groupby(['Airline', 'ProductName']).\
-#     agg('count')
-
-# #%%
-# df_airline_prod.groupby(['ProductName']).\
-#     agg('count').reset_index().\
-#     query('ProductName')
 
 #%%
 df_price_cap = data_reader(
@@ -127,12 +112,19 @@ df_price_cap.query('timecap_min > 0').\
 
 p.axes.set_title('Number of products per airline-route (Product with timecap)')
 
+
+#%%
+df_price_cap.query('datacap_mb > 0').\
+    groupby(['airline', 'routes', 'product_name']).size()
+
+
 #%%
 sns.jointplot(
     x='price_usd', y='datacap_mb', 
     kind='kde',
     data=df_price_cap.sample(10000)
  )
+
 
 #%%
 sns.jointplot(
@@ -204,37 +196,27 @@ df_price_cap.columns
 
 
 #%%
-def get_revenue(df):
-    "Returns overall datausage per FlightID"
-    df_rev = df.groupby('flight_id')['price_usd'].sum().\
-        reset_index().rename(columns={'price_usd':'flight_revenue_usd'})
+importlib.reload(wifipricing.data_reader)
+from wifipricing.data_reader import data_reader
+from wifipricing.data_reader import get_flight_summary
+from wifipricing.data_reader import get_product_summary
 
-    df = pd.merge(df, df_rev, on='flight_id', how='left')
-
-    return df
-
-#%%
-def get_flight_data_mb(df):
-    "Returns overall datausage per FlightID"
-    df_rev = df.groupby('flight_id')['price_usd'].sum().\
-        reset_index().rename(columns={'price_usd':'flight_revenue_usd'})
-
-    df = pd.merge(df, df_rev, on='flight_id', how='left')
-
-    return df
-
-#%%
 df_test = data_reader(
     "data/df_rfp_dataset_raw_20181218185047.csv",
     "data/data_reference.csv",
-    usecols=['flight_id', 'price_usd', 'total_usage_mb'],
-    nrows=5000
+    usecols=['flight_id', 'product_name', 'price_usd', 'total_usage_mb'],
+    nrows=15
 )
 
 #%%
-# flight_rev = df_price_cap.groupby('flight_id').price_usd.sum()
+df_test
+
 
 #%%
-get_revenue(df_test)
+get_product_summary(df_test).shape
+
+
+#%%
+
 
 #%%

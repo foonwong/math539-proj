@@ -9,7 +9,6 @@ def data_reader(data, data_dict, nrows=None, usecols=None):
     pd_nm = ref['pandas_name']
     type_dict = {k:v for k,v in zip(pd_nm, ref['pandas_dtype'])}
 
-    # df = pd.read_csv(data, names = pd_nm, dtype=type_dict, nrows=nrows, usecols=usecols)
     df = pd.read_csv(
         data, 
         names = pd_nm, header=1, 
@@ -20,33 +19,68 @@ def data_reader(data, data_dict, nrows=None, usecols=None):
     timecols = [x for x in df.columns if 'time' in x]
     df[timecols] = df[timecols].astype('datetime64')
 
-    if 'product_name' in df.columns: 
+    df = flight_df_add_features(df)    
+
+    return df 
+
+
+def flight_df_add_features(df):
+    """Add extra features to wifi dataframe if possible"""
+    try:
         prod_nm = df['product_name'].unique()
         datacap_dict = {x:get_datacap(x) for x in prod_nm}
         timecap_dict = {x:get_timecap(x) for x in prod_nm}
 
         df['datacap_mb'] = df['product_name'].map(lambda x: datacap_dict[x])
         df['timecap_min'] = df['product_name'].map(lambda x: timecap_dict[x])
-    
+    except:
+        pass
+
+    return df
+
+
+def get_flight_summary(df_detailed):
+    """Summarizing wifi dataframe for a flight level analysis""" 
+    df = df_detailed.groupby('flight_id').size().reset_index().drop(columns=0)
+
     try:
-        df_tr = get_takerate_overall(df)
+        df_tr = get_takerate_overall(df_detailed)
         df = pd.merge(df, df_tr, on=['flight_id', 'total_passengers'], how='left')
     except:
         pass
 
     try:
-        df_du = get_flight_data_mb(df)
+        df_du = get_flight_data_mb(df_detailed)
         df = pd.merge(df, df_du, on=['flight_id'], how='left')
     except:
         pass
 
     try:
-        df_rev = get_revenue(df)
+        df_rev = get_flight_revenue(df_detailed)
         df = pd.merge(df, df_rev, on=['flight_id'], how='left')
     except:
         pass
 
-    return df 
+    return df
+
+
+def get_product_summary(df_detailed):
+    """Summarizing wifi dataframe for a flight level analysis""" 
+    df = df_detailed.groupby(['flight_id', 'product_name']).size().reset_index().drop(columns=0)
+
+    try:
+        df_du = get_product_data_mb(df_detailed)
+        df = pd.merge(df, df_du, on=['flight_id', 'product_name'], how='left')
+    except:
+        pass
+
+    try:
+        df_rev = get_product_revenue(df_detailed)
+        df = pd.merge(df, df_rev, on=['flight_id', 'product_name'], how='left')
+    except:
+        pass
+
+    return df
 
 
 def get_datacap(x):
@@ -85,18 +119,34 @@ def get_takerate_overall(df):
     return tr_df
 
 
-def get_revenue(df):
+def get_flight_revenue(df):
     "Returns overall revenue per FlightID"
     df_rev = df.groupby('flight_id')['price_usd'].sum().\
         reset_index().rename(columns={'price_usd':'flight_revenue_usd'})
 
     return df_rev
 
-#%%
+
 def get_flight_data_mb(df):
     """Returns overall datausage per FlightID"""
     df_du = df.groupby('flight_id')['total_usage_mb'].sum().\
         reset_index().rename(columns={'total_usage_mb':'flight_data_mb'})
+
+    return df_du
+
+
+def get_product_revenue(df):
+    "Returns overall revenue per FlightID"
+    df_rev = df.groupby(['flight_id', 'product_name'])['price_usd'].sum().\
+        reset_index().rename(columns={'price_usd':'product_revenue_usd'})
+
+    return df_rev
+
+
+def get_product_data_mb(df):
+    """Returns overall datausage per FlightID"""
+    df_du = df.groupby(['flight_id', 'product_name'])['total_usage_mb'].sum().\
+        reset_index().rename(columns={'total_usage_mb':'product_data_mb'})
 
     return df_du
 
