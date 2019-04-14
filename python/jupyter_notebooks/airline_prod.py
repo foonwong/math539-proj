@@ -26,25 +26,17 @@ from wifipricing.data_reader import distinct
 
 
 #%%
-colnames_wifi = data_reader(
-    "data/df_rfp_dataset_raw_20181218185047.csv",
-    "data/data_reference.csv",
-    nrows=5
-).columns
-
-colnames_wifi
-
-
-#%%
 df_price_cap = data_reader(
     "data/df_rfp_dataset_raw_20181218185047.csv",
     "data/data_reference.csv",
-    usecols=['flight_id', 'routes', 'airline', 'price_usd', 'total_passengers',
+    usecols=['flight_id', 'price_usd', 'total_passengers',
              'product_name', 'total_usage_mb'],
 )
 
+
 #%%
 df_price_cap
+
 
 #%%
 df_price_cap.quantile(0.98)
@@ -66,7 +58,8 @@ print(f"Only {prop_1gb}% of customers use more than 1GB of data ")
 
 #%%
 sns.pairplot(df_price_cap[['total_usage_mb', 'price_usd', 'datacap_mb', 
-                           'timecap_min', 'price_per_mb', 'profit']].sample(1000))
+                           'timecap_min', 'price_per_mb', 'price_per_min', 
+                           'profit']].sample(1000))
 
 #%%
 sns.jointplot(
@@ -190,8 +183,8 @@ p.fig.suptitle('Distribution of price per MB vs profit per session')
 p = sns.jointplot(
     x='price_per_mb', y='total_usage_mb', 
     kind='kde',
-    xlim=(0,15),
-    ylim=(0,150),
+    # xlim=(0,15),
+    # ylim=(0,150),
     data=df_price_cap.sample(10000)
  )
 
@@ -241,15 +234,6 @@ df_price_cap.columns
 #%%
 
 
-#%%
-def distinct(df, cols):
-    "similar to dplyr's distinct"
-
-    df = df.groupby(cols).size().reset_index().\
-        drop(columns=0)
-
-    return df
-
 
 
 #%%
@@ -274,7 +258,18 @@ sns.pairplot(df_prod_summary[prod_quantile.index].sample(5000))
 sns.jointplot(
     x='datacap_mb', y='profit_per_psn',
     kind='kde',
+    xlim=(0, 10),
+    ylim=(0, 3),
     data=df_prod_summary.sample(50000)
+)
+
+#%%
+sns.jointplot(
+    x='price_per_mb', y='profit_per_psn',
+    kind='kde',
+    xlim=(0, 10),
+    ylim=(0, 3),
+    data=df_prod_summary.sample(10000)
 )
 
 #%%

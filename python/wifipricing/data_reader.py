@@ -1,8 +1,20 @@
 import pandas as pd
 import re
+from itertools import compress
 
-def data_reader(data, data_dict, nrows=None, usecols=None):
-    """reading in wifi data as pandas.DataFrame"""
+def data_reader(data, data_dict, nrows=None, skiprows=None, usecols=None):
+    """reading in wifi data as pandas.DataFrame.
+
+    Will create new columns for product data/time cap, pricing and profit
+    if possible.
+
+    Keyword arguments:
+    data -- path to wifi csv
+    data_dict -- path to reference csv with pandas colname and dtype info
+    nrows -- pd.read_csv nrows. Use None for all rows. (default None)
+    skiprows -- pd.read_csv skiprows. 
+    usecols -- pd.read_csv usecols. Use None for all cols. (default None)
+    """
 
     ref = pd.read_csv(data_dict)
 
@@ -10,18 +22,18 @@ def data_reader(data, data_dict, nrows=None, usecols=None):
     type_dict = {k:v for k,v in zip(pd_nm, ref['pandas_dtype'])}
 
     df = pd.read_csv(
-        data, 
-        names = pd_nm, header=1, 
-        nrows=nrows, usecols=usecols,
+        data,
+        names = pd_nm, header=1,
+        nrows=nrows, skiprows = skiprows, usecols=usecols,
         dtype = type_dict
     )
 
     timecols = [x for x in df.columns if 'time' in x]
     df[timecols] = df[timecols].astype('datetime64')
 
-    df = flight_df_add_features(df)    
+    df = flight_df_add_features(df)
 
-    return df 
+    return df
 
 
 def flight_df_add_features(df):
@@ -38,12 +50,12 @@ def flight_df_add_features(df):
 
     try:
         df['price_per_mb'] = df['price_usd'] / df['datacap_mb']
-        df['price_per_min'] =  df['price_usd'] / df['datacap_mb'] 
+        df['price_per_min'] =  df['price_usd'] / df['datacap_mb']
     except:
         pass
 
     try:
-        df['profit'] = get_profit(df['price_usd'], df['total_usage_mb']) 
+        df['profit'] = get_profit(df['price_usd'], df['total_usage_mb'])
     except:
         pass
 
@@ -51,7 +63,7 @@ def flight_df_add_features(df):
 
 
 def get_flight_summary(df_detailed):
-    """Summarizing wifi dataframe for a flight level analysis""" 
+    """Summarizing wifi dataframe for a flight level analysis"""
     df = df_detailed.groupby('flight_id').size().reset_index().drop(columns=0)
 
     try:
@@ -75,21 +87,49 @@ def get_flight_summary(df_detailed):
     return df
 
 
-def get_product_summary(df_detailed):
-    """Summarizing wifi dataframe for a flight level analysis""" 
-    ness_cols = ['flight_id', 'product_name', 'total_passengers', 'price_usd', 'price_per_mb']
+def get_product_summary(df_in):
+    """Summarizing wifi dataframe for a product level analysis
 
-    # Do a dynamic list next to accomodte other accetable columns
-    df = distinct(df_detailed, ness_cols)
-   
+    Will create new columns for product data/time cap, pricing and profit
+    if possible.
+
+    Note:
+    df_in needs to have at least:
+    ['flight_id', 'product_name', 'total_passengers', 'price_usd', 'price_per_mb', 'price_per_min']
+
+    Columns that are more detailed than flight-product level will be discarded
+    """
+
+    # Check minimum requirements to make product level summary
+    req_cols = ['flight_id', 'product_name', 'total_passengers',
+        'price_usd', 'price_per_mb', 'price_per_min']
+
+    missed = [(x not in df_in.columns) for x in req_cols]
+
+    if sum(missed): 
+        raise Exception(f'Input df must have {list(compress(req_cols, missed))}')
+
+
+    # include other columns that do not conflict with product level summary
+    other_cols = ['airline', 'flight_duration_type', 'tail_number',
+	    'aircraft_type', 'origin_iata', 'destination_iata',
+	    'departure_time_utc', 'landing_time_utc', 'departure_time_local',
+	    'landing_time_local', 'flight_duration_hrs', 'antenna_type',
+	    'orig_country', 'orig_region', 'seat_count', 'night_flight',
+	    'flight_type', 'category', 'airline_region', 'ac_frame', 'routes',
+	    'ife', 'e_xtv', 'e_xphone', 'one_media', 'dest_country', 'dest_region',
+	    'jack_seat_count', 'economy_pct', 'bus_pass_percent', 'luxury']
+
+    df = distinct(df_in, [x for x in df_in.columns if x in (req_cols + other_cols)])
+
     try:
-        df_du = get_data_per_psn(df_detailed)
+        df_du = get_data_per_psn(df_in)
         df = pd.merge(df, df_du, on=['flight_id', 'product_name', 'total_passengers'], how='left')
     except:
         pass
 
     try:
-        df_rev = get_rev_per_psn(df_detailed)
+        df_rev = get_rev_per_psn(df_in)
         df = pd.merge(df, df_rev, on=['flight_id', 'product_name'], how='left')
     except:
         pass
@@ -99,7 +139,7 @@ def get_product_summary(df_detailed):
     except:
         pass
 
-    df = flight_df_add_features(df) 
+    df = flight_df_add_features(df)
 
     return df
 
@@ -119,7 +159,7 @@ def get_datacap(x):
 def get_profit(revenue, data_mb, cost_per_mb = 0.05):
     """Calculate profit from revenue and data usage"""
     try:
-        prof = revenue - data_mb * cost_per_mb 
+        prof = revenue - data_mb * cost_per_mb
     except:
         prof = None
 
@@ -130,7 +170,7 @@ def get_profit(revenue, data_mb, cost_per_mb = 0.05):
 def get_timecap(x):
     """Extract time cap in min from productname"""
     data = re.search('(?i)([\d]+) ?(min|h)', x)
-    
+
     try:
         if data.group(2).upper() == 'H':
             data =  60 * float(data.group(1))
