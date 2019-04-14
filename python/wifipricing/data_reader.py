@@ -37,7 +37,8 @@ def flight_df_add_features(df):
         pass
 
     try:
-        df['price_per_mb'] = df['datacap_mb'] / df['price_usd']
+        df['price_per_mb'] = df['price_usd'] / df['datacap_mb']
+        df['price_per_min'] =  df['price_usd'] / df['datacap_mb'] 
     except:
         pass
 
