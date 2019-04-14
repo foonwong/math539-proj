@@ -29,7 +29,7 @@ from wifipricing.data_reader import distinct
 df_price_cap = data_reader(
     "data/df_rfp_dataset_raw_20181218185047.csv",
     "data/data_reference.csv",
-    skiprows=lambda i: i % 1000 != 0, # only get 1/1000 rows
+    skiprows=np.random.choice(range(int(4e6)), size=int(3.5e6), replace=False), 
     usecols=['flight_id', 'product_name', 'total_passengers', 'price_usd',
         'night_flight']
 )

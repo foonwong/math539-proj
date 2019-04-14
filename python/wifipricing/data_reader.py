@@ -50,7 +50,7 @@ def flight_df_add_features(df):
 
     try:
         df['price_per_mb'] = df['price_usd'] / df['datacap_mb']
-        df['price_per_min'] =  df['price_usd'] / df['datacap_mb']
+        df['price_per_min'] =  df['price_usd'] / df['timecap_min']
     except:
         pass
 
@@ -101,8 +101,11 @@ def get_product_summary(df_in):
     """
 
     # Check minimum requirements to make product level summary
-    req_cols = ['flight_id', 'product_name', 'total_passengers',
-        'price_usd', 'price_per_mb', 'price_per_min']
+    # req_cols = ['flight_id', 'product_name', 'total_passengers', 
+    #     'price_usd', 'price_per_mb', 'price_per_min']
+
+    req_cols = ['flight_id', 'product_name', 'total_passengers', 
+        'price_usd']
 
     missed = [(x not in df_in.columns) for x in req_cols]
 
