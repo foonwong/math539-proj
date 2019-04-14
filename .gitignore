@@ -1,5 +1,10 @@
 .Rproj.user
 .Rhistory
-.RData
+**.RData
+**.rdb
+**.rdx
 .Ruserdata
-df_rfp_dataset_raw_20181218185047.csv
+cache
+**df_rfp_dataset_raw*.csv
+**userflight*.csv
+**flight_stats*.csv

@@ -1,0 +1,50 @@
+,col_number,col_name,pandas_name,R_class,unique_count,need_clarification,notes,Response,dplyr_col_type,pandas_dtype,categorical,unique
+0,1,RawDataKey,raw_data_key,numeric,4181546,N,,,n,float64,0,
+1,2,UserID,user_id,character,1068154,N,,,c,object,0,
+2,3,SessionID,session_id,character,4181197,N,,,c,object,0,
+3,4,SessionAccountType,session_account_type,factor,12,Y,Do voucher/tokens cost less to customers?,How they paid.,c,category,1,"COMP-TOKEN, CreditCard, Panasonic, Panasonic - FirstDat, Panasonic - PROD, PayPal, PayPal - PROD, PayPal-PRD, Valor Mileage, Voucher, Voucher+CC, WISP"
+4,5,ProductName,product_name,character,144,N,,,c,object,0,
+5,6,PaymentCardType,payment_card_type,factor,10,N,,,c,category,1,"AMEX, CUP, DC, DISC, JCB, MC, NotApplicable, Unknown, VISA"
+6,7,DeviceTypes,device_types,factor,17,N,,,c,category,1,"laptop, laptop,mobile, laptop,mobile,tablet, laptop,tablet, laptop,tablet,mobile, mobile, mobile,laptop, mobile,laptop,tablet, mobile,tablet, mobile,tablet,laptop, tablet, tablet,laptop, tablet,laptop,mobile, tablet,mobile, tablet,mobile,laptop, UNKNOWN"
+7,8,SessionStartTime,session_start_time,"POSIXct, POSIXt",4010759,N,,,T,object,0,
+8,9,SessionEndTime,session_end_time,"POSIXct, POSIXt",3667425,N,,,T,object,0,
+9,10,SessionDurationMinutes,session_duration_minutes,numeric,2939,N,,,n,float32,0,
+10,11,SessionVolumeUpAmount,session_volume_up_amount,numeric,71070,N,,,n,float32,0,
+11,12,SessionVolumeDownAmount,session_volume_down_amount,numeric,120729,N,,,n,float32,0,
+12,13,FlightID,flight_id,character,567089,N,,,c,object,0,
+13,14,Airline,airline,factor,23,N,,,c,category,1,"AAL, AAR, AEA, AMX, ANA, ASL, AZA, CPA, CRK, EWG, FIN, IBE, KAC, KLM, MAS, QTR, REU, RWD, SEY, SIA, SWR, THA, WJA"
+14,15,FlightDurationType,flight_duration_type,factor,5,N,,,c,category,1,"Long-Haul, Medium-Haul, Short-Haul, Ultra Long-Haul, Ultra Short-Haul"
+15,16,TailNumber,tail_number,character,689,N,,,c,category,1,
+16,17,AircraftType,aircraft_type,factor,28,N,,,c,category,1,"319-100, 320-100, 320-200, 320-230, 321-100, 321-200, 330-200, 330-220, 330-240, 330-300, 340-300, 350-1000, 350-900, 737-700, 737-800, 737-MAX8, 757-200, 767-300, 767-300ER, 777-200, 777-200ER, 777-220, 777-240, 777-300, 777-300ER, 787-10, 787-8, 787-9"
+17,18,OriginIATA,origin_iata,character,452,N,,,c,category,1,
+18,19,DestinationIATA,destination_iata,character,439,N,,,c,category,1,
+19,20,DepartureTimeUTC,departure_time_utc,"POSIXct, POSIXt",430356,N,,,T,object,0,
+20,21,LandingTimeUTC,landing_time_utc,"POSIXct, POSIXt",434820,N,,,T,object,0,
+21,22,DepartureTimeLocal,departure_time_local,"POSIXct, POSIXt",394609,N,,,T,object,0,
+22,23,LandingTimeLocal,landing_time_local,"POSIXct, POSIXt",400013,N,,,T,object,0,
+23,24,FlightDurationHrs,flight_duration_hrs,numeric,1076,N,,,n,float16,0,
+24,25,AntennaType,antenna_type,factor,5,Y,Any more on cost to panasonic?,How would you use that? I dont have that information,c,category,1,"C: Commerc, DPA-02, Melco, SPA-01"
+25,26,Orig_Country,orig_country,factor,137,N,,,c,category,1,
+26,27,Orig_Region,orig_region,factor,10,N,,,c,category,1,"Africa, Americas, Asia, Asia/ Europe, Asia/ Middle East, Europe, Europe/ Africa, Middle East, Oceania"
+27,28,TotalUsageMB,total_usage_mb,numeric,210155,N,,,n,float32,0,
+28,29,WiFiUsers,wifi_users,numeric,88,Y,What does this mean?,per flight number of passengers using WiFi,n,float16,0,"1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 86, 96, 115, 128, 135"
+29,30,SeatCount,seat_count,numeric,91,Y,What does this mean?,# of seats in the flight/AC,n,float16,0,"6, 52, 119, 124, 128, 130, 154, 155, 160, 161, 166, 167, 168, 174, 175, 180, 182, 183, 184, 189, 197, 200, 208, 209, 214, 215, 226, 234, 236, 237, 240, 243, 246, 248, 253, 254, 255, 256, 258, 260, 262, 263, 264, 265, 266, 268, 270, 271, 273, 274, 277, 280, 282, 284, 285, 286, 288, 289, 291, 292, 293, 294, 296, 297, 298, 299, 304, 310, 311, 313, 316, 318, 321, 325, 331, 333, 334, 336, 337, 340, 342, 355, 358, 377, 382, 395, 408, 412, 417, 438"
+30,31,TotalPassengers,total_passengers,numeric,177,N,,,n,float16,0,
+31,32,NightFlight,night_flight,factor,3,N,,,c,category,1,"Normal, RedEye"
+32,33,FlightType,flight_type,factor,3,N,,,c,category,1,"Domestic, International"
+33,34,Category,category,factor,4,Y,Is this based on consumer usage or package purchased?,They categorized each product in a type.,c,category,1,"Browsing, Streaming, Text"
+34,35,Airline_Region,airline_region,factor,5,N,,,c,category,1,"Americas, Asia, Europe, Japan, Middle East"
+35,36,AC Frame,ac_frame,factor,3,Y,What does this mean?,"AC(Aircraft) Fram type , NB(Narrow Body) WB(Wide Body)",c,category,1,"NB, WB"
+36,37,Routes,routes,character,3048,N,,,c,category,1,
+37,38,Price/USD,price_usd,numeric,101,N,,,n,float16,0,
+38,39,IFE,ife,factor,3,Y,What does this mean?,IFE (InFlight Entertainment) often used for the presense of a seatback/media ,c,category,1,"0, 1"
+39,40,eXTV,e_xtv,factor,3,Y,What does this mean?,Live TV if it is present on flight,c,category,1,"0, 1"
+40,41,eXPhone,e_xphone,factor,3,Y,What does this mean?,Phone ,c,category,1,"0, 1"
+41,42,OneMedia,one_media,factor,3,Y,What does this mean?,Advertisement by Panasonic,c,category,1,"0, 1"
+42,43,Service_count,service_count,numeric,6,Y,What does this mean?,,n,float16,0,"1, 2, 3, 4, 5"
+43,44,Dest_Country,dest_country,factor,138,N,,,c,category,1,
+44,45,Dest_Region,dest_region,factor,10,N,,,c,category,1,"Africa, Americas, Asia, Asia/ Europe, Asia/ Middle East, Europe, Europe/ Africa, Middle East, Oceania"
+45,46,JackSeatCount,jack_seat_count,numeric,65,Y,What does this mean?,Number of total seats on flight from an internal data source called jack ,n,float16,0,"130, 144, 146, 154, 161, 166, 167, 169, 174, 176, 189, 194, 209, 215, 223, 226, 236, 240, 243, 246, 249, 253, 254, 256, 258, 260, 262, 263, 264, 270, 271, 274, 280, 285, 286, 288, 289, 291, 293, 294, 296, 297, 298, 299, 300, 306, 308, 310, 311, 313, 321, 333, 334, 335, 336, 337, 340, 382, 388, 395, 405, 425, 438, 442, 514"
+46,47,Economy_pct,economy_pct,numeric,30,Y,What does this mean?,Percentage of economy seats,n,float16,0,"0, 52, 60, 61, 62, 65, 66, 67, 68, 70, 73, 74, 76, 77, 78, 79, 80, 82, 83, 86, 87, 88, 89, 90, 91, 92, 93, 95, 96, 100"
+47,48,BusPassPercent,bus_pass_percent,numeric,30,Y,What does this mean?,Percent of non economy seats,n,float16,0,"15, 18.4, 19.25, 20.95, 21.8, 22.65, 23.5, 24.35, 25.2, 26.05, 26.9, 29.45, 30.3, 32, 32.85, 33.7, 34.55, 35.4, 37.1, 37.95, 40.5, 42.2, 43.05, 43.9, 44.75, 47.3, 48.15, 49, 55.8, 100"
+48,49,luxury,luxury,factor,3,Y,Would like more details,We have identified luxury airlines,c,category,1,"0, 1"
