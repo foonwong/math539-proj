@@ -236,3 +236,14 @@ def distinct(df, cols):
         drop(columns=0)
 
     return df
+
+
+def move_target_to_end(df, target):
+    "Move target column to the last column"
+    colorder = [col for col in df.columns if col != target]
+    colorder.append(target)
+
+    return df[colorder]
+
+
+
