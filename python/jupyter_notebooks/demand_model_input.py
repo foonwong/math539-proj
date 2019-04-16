@@ -29,35 +29,64 @@ from wifipricing.data_reader import data_reader
 from wifipricing.data_reader import get_flight_summary
 from wifipricing.data_reader import get_product_summary
 from wifipricing.data_reader import distinct
+from wifipricing.data_reader import get_categorical_columns
 from wifipricing.data_reader import move_target_to_end
 
 
 #%%
+usecol=[
+    'product_name',
+    'flight_id',
+    'airline',
+    'aircraft_type',
+    'flight_duration_hrs',
+    'total_usage_mb',
+    'seat_count',
+    'total_passengers',
+    'night_flight',
+    'flight_type',
+    'category',
+    'ac_frame',
+    'routes',
+    'price_usd',
+    'ife',
+    'e_xtv',
+    'e_xphone',
+    'one_media',
+    'jack_seat_count',
+    'economy_pct',
+    'bus_pass_percent',
+    'luxury',
+    'origin_iata',
+    'orig_country',
+    # 'orig_region',
+    # 'destination_iata',
+    'dest_country'
+    # 'dest_region',
+    # 'airline_region'
+
+    # 'antenna_type',
+    # 'flight_duration_type'
+    # 'session_start_time',
+    # 'session_end_time',
+    # 'session_duration_minutes',
+    # 'session_volume_up_amount',
+    # 'session_volume_down_amount',
+    # 'departure_time_utc',
+    # 'landing_time_utc',
+    # 'departure_time_local',
+    # 'landing_time_local'
+]
+
 df = data_reader(
     "data/df_rfp_dataset_raw_20181218185047.csv",
     "data/data_reference.csv",
     # skiprows=np.random.choice(range(int(4e6)), int(3e6), replace=False), 
-    usecols=[
-        'flight_id', 
-        'product_name', 
-        'total_passengers', 
-        'price_usd',
-        'total_usage_mb', 
-        'night_flight',
-        # 'routes',
-        'flight_duration_type',
-        'orig_region',
-        'dest_region',
-        # 'orig_country',
-        # 'dest_country',
-        'economy_pct'
-    ]
+    usecols=usecol
 )
 
-#%%
-df = df.\
-    assign(timecap = lambda x: x['timecap_min'] >= 0).\
-    assign(datacap = lambda x: x['datacap_mb'] >= 0)
+df.head()
+f'df dimensions: {df.shape}'
 
 
 #%%
@@ -101,6 +130,160 @@ p = sns.distplot(df_summarized_timecap['profit_per_psn'])
 #%%
 p = sns.distplot(df_summarized_nocap['profit_per_psn'])
 
+
+#%%
+sns.scatterplot(
+    x='price_usd', hue='datacap_mb',
+    y='profit_per_psn',
+    data=df_summarized_datacap.sample(5000)
+)
+
+#%%
+mdlcols=[
+    # created columns
+    'datacap_mb'
+    , 'has_timecap'
+    , 'profit_per_psn'
+
+    # Original features
+    , 'airline'
+    , 'aircraft_type'
+    , 'flight_duration_hrs'
+    , 'total_usage_mb'
+    , 'seat_count'
+    , 'night_flight'
+    , 'flight_type'
+    , 'category'
+    , 'ac_frame'
+    , 'routes'
+    , 'price_usd'
+    , 'ife'
+    , 'e_xtv'
+    , 'e_xphone'
+    , 'one_media'
+    , 'jack_seat_count'
+    , 'economy_pct'
+    , 'bus_pass_percent'
+    , 'luxury'
+
+    # , 'origin_iata'
+    # , 'orig_country'
+    # , 'orig_region'
+    # , 'destination_iata'
+    # , 'dest_country'
+    # , 'dest_region'
+    # , 'airline_region'
+
+    # , 'antenna_type'
+    # , 'flight_duration_type'
+    # , 'session_start_time'
+    # , 'session_end_time'
+    # , 'session_duration_minutes'
+    # , 'session_volume_up_amount'
+    # , 'session_volume_down_amount'
+    # , 'departure_time_utc'
+    # , 'landing_time_utc'
+    # , 'departure_time_local'
+    # , 'landing_time_local'
+]
+
+
+df_model = df_summarized_datacap.\
+    assign(has_timecap = lambda x: x['price_per_min'].notnull()).\
+    loc[:, mdlcols].\
+    pipe(pd.get_dummies).\
+    pipe(move_target_to_end, target='profit_per_psn')
+
+df_model.head()
+f'model dataframe dimensions: {df_model.shape}'
+
+x = df_model.iloc[:, :-1]
+y = df_model.iloc[:, -1]
+
+x
+y
+
+
+
+#%%
+from sklearn.model_selection import KFold
+kfold = KFold(n_splits =3)
+
+for train_ind, test_ind in kfold.split(x):
+    print("\nFOLD")
+    print("train", train_ind)
+    print("test", test_ind)
+
+
+#%%
+x.iloc[train_ind, :]
+y[train_ind]
+
+
+#%%
+from lightgbm import LGBMRegressor
+lgb_reg = LGBMRegressor(silent=False)
+
+lgb_reg.fit(x.iloc[train_ind, :], y[train_ind])
+
+prediction = lgb_reg.predict(x.iloc[test_ind, :])
+
+
+#%%
+feat_imp = lgb_reg.feature_importances_
+
+pd.DataFrame({'feat':x.columns, 'imp':feat_imp}).\
+    sort_values('imp', ascending=False).\
+    iloc[:20, :].\
+    plot(kind='bar', x='feat')
+
+
+#%%
+smp = np.random.randint(1, 90000, size = 10000)
+
+y_test = np.array(y[test_ind])
+
+sns.jointplot(prediction[smp], y_test[smp], kind='kde',
+    ylim = (0,1), xlim=(0,1))
+
+
+
+#%%
+# from sklearn import linear_model
+# from sklearn.model_selection import GridSearchCV
+
+# hyper_p = {'alpha': np.logspace(-6, 2, 10)}
+# print(hyper_p)
+
+# lasso = linear_model.Lasso(random_state=1337)
+# lassoCV = GridSearchCV(lasso, hyper_p)
+
+# lassoCV.fit(x, y)
+
+
+#%%
+# lassoCV.cv_results_
+
+# scores = lassoCV.cv_results_['mean_test_score']
+# scores_std = lassoCV.cv_results_['std_test_score']
+
+# plt.semilogx(hyper_p['alpha'], scores)
+
+# #%%
+
+# prediction = lasso.predict(x.iloc[test_ind, :])
+# [(pred, y) for pred, y in zip(prediction, y[test_ind])]
+
+# p = sns.scatterplot(prediction, y[test_ind])
+# p.set(xlabel='prediction', ylabel='data', xlim=(-1,1), ylim=(-1,1))
+
+
+# #%%
+# import re
+# # lassoCV.cv_results_[f'split{x}_test_score' for x in range(3alpha_)]
+# split_scores = [lassoCV.cv_results_[y] for y in lassoCV.cv_results_ if re.match('split.+test_score', y)]
+
+# plt.semilogx(hyper_p['alpha'], split_scores[1])
 
 # #%%
 # # Corr plot
@@ -147,81 +330,5 @@ p = sns.distplot(df_summarized_nocap['profit_per_psn'])
 
 # #%%
 # prod_summary.shape
-
-# #%%
-sns.scatterplot(
-    x='price_usd', hue='datacap_mb',
-    y='profit_per_psn',
-    data=df_summarized_datacap.sample(5000)
-)
-
-#%%
-mdl_cols = [
-    'price_usd',
-    'datacap_mb',
-    # 'flight_duration_type',
-    # 'orig_region',
-    # 'dest_region',
-    # 'night_flight',
-    'economy_pct',
-    # 'has_timecap',
-    'profit_per_psn'
-]
-
-df_model = df_summarized_datacap.\
-    assign(has_timecap = lambda x: x['price_per_min'].notnull()).\
-    loc[:, mdl_cols].\
-    pipe(move_target_to_end, target='profit_per_psn')
-
-x = df_model.iloc[:, :-1]
-y = df_model.iloc[:, -1]
-
-#%%
-x
-y
-
-#%%
-# # This transforms everything!
-# from sklearn.preprocessing import OneHotEncoder
-# ohe = OneHotEncoder(sparse=False)
-# x_transformed = ohe.fit_transform(x)
-
-
-#%%
-from sklearn.model_selection import KFold
-kfold = KFold(n_splits =3)
-
-for train_ind, test_ind in kfold.split(x):
-    print("\nFOLD")
-    print("train", train_ind)
-    print("test", test_ind)
-
-#%%
-x.iloc[train_ind, :]
-y[train_ind]
-
-#%%
-from lightgbm import LGBMRegressor
-lgb_reg = LGBMRegressor(silent=False)
-
-lgb_reg.fit(x.iloc[train_ind, :], y[train_ind])
-
-prediction = lgb_reg.predict(x.iloc[test_ind, :])
-
-p = sns.scatterplot(prediction, y[test_ind])
-p.set(xlabel='prediction', ylabel='data', xlim=(-1,1), ylim=(-1,1))
-
-
-#%%
-from sklearn import linear_model
-lasso = linear_model.Lasso()
-
-lasso.fit(x.iloc[train_ind, :], y[train_ind])
-prediction = lasso.predict(x.iloc[test_ind, :])
-[(pred, y) for pred, y in zip(prediction, y[test_ind])]
-
-p = sns.scatterplot(prediction, y[test_ind])
-p.set(xlabel='prediction', ylabel='data', xlim=(-1,1), ylim=(-1,1))
-
 
 #%%

@@ -21,6 +21,11 @@ def data_reader(data, data_dict, nrows=None, skiprows=None, usecols=None):
     pd_nm = ref['pandas_name']
     type_dict = {k:v for k,v in zip(pd_nm, ref['pandas_dtype'])}
 
+    badcol = [x for x in usecols if x not in list(pd_nm)]
+
+    if len(badcol) > 0: 
+        raise Exception(f"{badcol} not a valid choice. Reference to refence's pandas_name")
+
     df = pd.read_csv(
         data,
         names = pd_nm, header=1,
@@ -40,11 +45,20 @@ def flight_df_add_features(df):
     """Add extra features to wifi dataframe if possible"""
     try:
         prod_nm = df['product_name'].unique()
-        datacap_dict = {x:get_datacap(x) for x in prod_nm}
-        timecap_dict = {x:get_timecap(x) for x in prod_nm}
+    except:
+        pass
 
+    try:
+        datacap_dict = {x:get_datacap(x) for x in prod_nm}
         df['datacap_mb'] = df['product_name'].map(lambda x: datacap_dict[x])
+        df['datacap'] = df['datacap_mb'].notnull()
+    except:
+        pass
+
+    try:
+        timecap_dict = {x:get_timecap(x) for x in prod_nm}
         df['timecap_min'] = df['product_name'].map(lambda x: timecap_dict[x])
+        df['timecap'] = df['timecap_min'].notnull()
     except:
         pass
 
@@ -169,7 +183,6 @@ def get_profit(revenue, data_mb, cost_per_mb = 0.05):
     return prof
 
 
-
 def get_timecap(x):
     """Extract time cap in min from productname"""
     data = re.search('(?i)([\d]+) ?(min|h)', x)
@@ -246,4 +259,10 @@ def move_target_to_end(df, target):
     return df[colorder]
 
 
+def get_categorical_columns(df):
+    cols = df.dtypes.reset_index().\
+                rename(columns= {0:'dtype'}).\
+                query('dtype == "category"').\
+                loc[:, 'index']
 
+    return cols
