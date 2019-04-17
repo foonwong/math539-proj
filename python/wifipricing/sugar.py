@@ -1,5 +1,6 @@
 import re
 import pandas as pd
+import warnings 
 
 def preview(df, x=5):
     "Show first x and last x rows and dimensions of a dataframe"
@@ -14,19 +15,22 @@ def preview(df, x=5):
 def distinct(df, cols, fillna=True):
     "similar to dplyr's distinct. Find distinct combination of a list of columns"
 
-    df = df[cols]
+    out_df = df.copy(deep=True)[cols]
 
     if fillna:
         for col in cols:
-            if (df[col].dtype.name) == 'category':
-                df[col] = df[col].cat.add_categories([-999])
+            if (out_df[col].dtype.name) == 'category':
+                out_df.loc[:, col] = out_df[col].cat.add_categories([-999])
 
-        df = df.fillna(-999)
+        out_df = out_df.fillna(-999)
 
-    df = df.groupby(cols).size().reset_index().\
+    if sum(out_df.count() == out_df.shape[0]) < out_df.shape[0]:
+        warnings.warn("Missing data is dropped")
+
+    out_df = out_df.groupby(cols).size().reset_index().\
         drop(columns=0)
 
-    return df
+    return out_df
 
 
 def move_target_to_end(df, target):
@@ -56,8 +60,18 @@ def missing_data_report(df):
     prop = 1 - round(df.count().sort_values() / df.shape[0], 4)
     prop = prop[prop > 0]
 
+    print(f'Dataframe dimensions: {df.shape}')
     print('Missing data:')
     for i,v in zip(prop.index, prop):
         print(f'{i}:  {round(v*100, 4)}%')
 
     return None
+
+
+def is_subset(x, y):
+    """Check if list x is subset of y 
+
+    Keyword arguments:
+    x, y: lists"""
+
+    return set(x).issubset(set(y))
