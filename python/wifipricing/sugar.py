@@ -50,3 +50,14 @@ def get_columns_by_type(df, types='.'):
         if re.search(types, typ.name)]
 
     return cats
+
+
+def missing_data_report(df):
+    prop = 1 - round(df.count().sort_values() / df.shape[0], 4)
+    prop = prop[prop > 0]
+
+    print('Missing data:')
+    for i,v in zip(prop.index, prop):
+        print(f'{i}:  {round(v*100, 4)}%')
+
+    return None
