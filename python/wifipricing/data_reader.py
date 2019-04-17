@@ -240,29 +240,3 @@ def get_data_per_psn(df):
         assign(data_per_psn = lambda x: x['data_per_psn'] / x['total_passengers'])
 
     return df_du
-
-
-def distinct(df, cols):
-    "similar to dplyr's distinct"
-
-    df = df.groupby(cols).size().reset_index().\
-        drop(columns=0)
-
-    return df
-
-
-def move_target_to_end(df, target):
-    "Move target column to the last column"
-    colorder = [col for col in df.columns if col != target]
-    colorder.append(target)
-
-    return df[colorder]
-
-
-def get_categorical_columns(df):
-    cols = df.dtypes.reset_index().\
-                rename(columns= {0:'dtype'}).\
-                query('dtype == "category"').\
-                loc[:, 'index']
-
-    return cols
