@@ -9,4 +9,6 @@ cache
 **userflight*.csv
 **flight_stats*.csv
 
-**.pyc
+*.pyc
+*.ipynb_checkpoints
+**pycache
