@@ -1,0 +1,46 @@
+# #%%
+# seatcol=[
+#     # 'product_name',
+#     # 'flight_id',
+#     # 'airline',
+#     'aircraft_type',
+#     # 'flight_duration_hrs',
+#     # 'total_usage_mb',
+#     'seat_count',
+#     'total_passengers',
+#     # 'night_flight',
+#     # 'flight_type',
+#     # 'category',
+#     'ac_frame',
+#     # 'routes',
+#     # 'price_usd',
+#     # 'ife',
+#     # 'e_xtv',
+#     # 'e_xphone',
+#     # 'one_media',
+#     'jack_seat_count',
+#     # 'economy_pct',
+#     # 'bus_pass_percent',
+#     # 'luxury',
+#     # 'origin_iata',
+#     # 'orig_country',
+#     # 'orig_region',
+#     # 'destination_iata',
+#     # 'dest_country',
+#     # 'dest_region'
+#     # 'airline_region'
+
+#     # 'antenna_type',
+#     # 'flight_duration_type'
+#     # 'session_start_time',
+#     # 'session_end_time',
+#     # 'session_duration_minutes',
+#     # 'session_volume_up_amount',
+#     # 'session_volume_down_amount',
+#     # 'departure_time_utc',
+#     # 'landing_time_utc',
+#     # 'departure_time_local',
+#     # 'landing_time_local'
+# ]
+
+# #%%

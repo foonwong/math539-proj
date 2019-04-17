@@ -1,8 +1,5 @@
 #%%
-sys.path.append('python')
-
-
-#%%
+import sys
 import importlib
 import re
 import numpy as np
@@ -10,6 +7,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+sys.path.append('python')
 sns.set(color_codes=True)
 
 
@@ -30,7 +28,6 @@ import wifipricing.sugar
 importlib.reload(wifipricing.sugar)
 
 from wifipricing.data_reader import data_reader
-from wifipricing.data_reader import get_flight_summary
 from wifipricing.data_reader import get_product_summary
 from wifipricing.sugar import *
 
