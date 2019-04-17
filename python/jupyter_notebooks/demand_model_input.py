@@ -1,4 +1,4 @@
-#%%
+%%
 sys.path.append('python')
 
 
@@ -14,7 +14,7 @@ sns.set(color_codes=True)
 
 #%%
 pd.set_option('display.max_columns', 999)
-pd.set_option('display.max_rows', 15) 
+pd.set_option('display.max_rows', 150) 
 
 
 #%%
@@ -25,15 +25,17 @@ InteractiveShell.ast_node_interactivity = "all"
 #%%
 import wifipricing.data_reader
 importlib.reload(wifipricing.data_reader)
+import wifipricing.sugar 
+importlib.reload(wifipricing.sugar)
+
 from wifipricing.data_reader import data_reader
 from wifipricing.data_reader import get_flight_summary
 from wifipricing.data_reader import get_product_summary
-from wifipricing.data_reader import distinct
-from wifipricing.data_reader import get_categorical_columns
-from wifipricing.data_reader import move_target_to_end
+from wifipricing.sugar import *
 
 
 #%%
+# Load data
 usecol=[
     'product_name',
     'flight_id',
@@ -59,10 +61,10 @@ usecol=[
     'luxury',
     'origin_iata',
     'orig_country',
-    # 'orig_region',
+    'orig_region',
     # 'destination_iata',
-    'dest_country'
-    # 'dest_region',
+    'dest_country',
+    'dest_region'
     # 'airline_region'
 
     # 'antenna_type',
@@ -81,7 +83,6 @@ usecol=[
 df = data_reader(
     "data/df_rfp_dataset_raw_20181218185047.csv",
     "data/data_reference.csv",
-    # skiprows=np.random.choice(range(int(4e6)), int(3e6), replace=False), 
     usecols=usecol
 )
 
@@ -102,12 +103,16 @@ f'both: {bothcapped} '
 f'None: {nocapped} '
 
 
+
+
 #%%
 df_summarized_datacap = df[df['datacap']].pipe(get_product_summary)
 df_summarized_timecap = df[df['timecap']].pipe(get_product_summary)
 
 nocapcol = [x for x in df.columns if ('cap' not in x) and ('price_per' not in x)]
-df_summarized_nocap = df[~(df['datacap'] | df['timecap'])][nocapcol].pipe(get_product_summary)
+df_summarized_nocap = df[~(df['datacap'] | df['timecap'])][nocapcol].\
+    pipe(get_product_summary)
+
 
 
 
@@ -116,9 +121,13 @@ df_summarized_datacap.shape[0]
 df_summarized_timecap.shape[0]
 df_summarized_nocap.shape[0]
 
+#%%
 df_summarized_datacap.head(5)
 df_summarized_timecap.head(5)
 df_summarized_nocap.head(5)
+
+#%%
+df.groupby('product_name').size()
 
 
 #%%
@@ -139,6 +148,7 @@ sns.scatterplot(
 )
 
 #%%
+# Prepare for model: datacapped data
 mdlcols=[
     # created columns
     'datacap_mb'
@@ -149,13 +159,12 @@ mdlcols=[
     , 'airline'
     , 'aircraft_type'
     , 'flight_duration_hrs'
-    , 'total_usage_mb'
     , 'seat_count'
     , 'night_flight'
     , 'flight_type'
     , 'category'
     , 'ac_frame'
-    , 'routes'
+    # , 'routes'
     , 'price_usd'
     , 'ife'
     , 'e_xtv'
@@ -167,10 +176,10 @@ mdlcols=[
     , 'luxury'
 
     # , 'origin_iata'
-    # , 'orig_country'
+    , 'orig_country'
     # , 'orig_region'
     # , 'destination_iata'
-    # , 'dest_country'
+    , 'dest_country'
     # , 'dest_region'
     # , 'airline_region'
 
@@ -187,7 +196,11 @@ mdlcols=[
     # , 'landing_time_local'
 ]
 
+f'Quick columns check: \
+    {[x for x in mdlcols if (x not in df_summarized_datacap.columns)]}\
+    is not in summary dataframe.'
 
+#%%
 df_model = df_summarized_datacap.\
     assign(has_timecap = lambda x: x['price_per_min'].notnull()).\
     loc[:, mdlcols].\
@@ -197,6 +210,18 @@ df_model = df_summarized_datacap.\
 df_model.head()
 f'model dataframe dimensions: {df_model.shape}'
 
+#%%
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+
+# col_encod = [c for c, t in zip(df_model.columns, df_model.dtypes) if t = 'category']
+# # col_scale = df_model.columns
+# col_encod
+
+df_model.columns
+df_model.dtypes
+
+
+#%%
 x = df_model.iloc[:, :-1]
 y = df_model.iloc[:, -1]
 
@@ -221,6 +246,7 @@ y[train_ind]
 
 
 #%%
+# LightGBM 
 from lightgbm import LGBMRegressor
 lgb_reg = LGBMRegressor(silent=False)
 
@@ -246,6 +272,61 @@ y_test = np.array(y[test_ind])
 sns.jointplot(prediction[smp], y_test[smp], kind='kde',
     ylim = (0,1), xlim=(0,1))
 
+
+#%%
+# Good o random forest
+from sklearn.ensemble import RandomForestRegressor
+rf_reg = RandomForestRegressor()
+
+rf_reg.fit(x.iloc[train_ind, :], y[train_ind])
+
+prediction_rf = rf_reg.predict(x.iloc[test_ind, :])
+
+
+#%%
+feat_imp_rf = rf_reg.feature_importances_
+
+pd.DataFrame({'feat':x.columns, 'imp':feat_imp_rf}).\
+    sort_values('imp', ascending=False).\
+    iloc[:20, :].\
+    plot(kind='bar', x='feat')
+
+
+#%%
+smp = np.random.randint(1, 90000, size = 10000)
+
+y_test = np.array(y[test_ind])
+
+sns.jointplot(prediction_rf[smp], y_test[smp], kind='kde',
+    ylim = (0,1), xlim=(0,1))
+
+
+#%%
+#  Lasso
+from sklearn.linear_model import Lasso
+lasso_reg = Lasso(alpha=0.06)
+
+lasso_reg.fit(x.iloc[train_ind, :], y[train_ind])
+
+prediction_las = lasso_reg.predict(x.iloc[test_ind, :])
+
+
+#%%
+lasso_reg.coef_
+
+pd.DataFrame({'feat':x.columns, 'imp':lasso_reg.coef_}).\
+    sort_values('imp', ascending=False).\
+    iloc[:20, :].\
+    plot(kind='bar', x='feat')
+
+
+#%%
+smp = np.random.randint(1, 90000, size = 10000)
+
+y_test = np.array(y[test_ind])
+
+sns.jointplot(prediction_rf[smp], y_test[smp], kind='kde',
+    ylim = (0,1), xlim=(0,1))
 
 
 #%%
@@ -332,3 +413,33 @@ sns.jointplot(prediction[smp], y_test[smp], kind='kde',
 # prod_summary.shape
 
 #%%
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+
+# col_encod = [c for c, t in zip(df_model.columns, df_model.dtypes) if t = 'category']
+# # col_scale = df_model.columns
+# col_encod
+
+# cats = get_categorical_columns(df_model) 
+#%%
+
+
+
+#%%
+df_model.one_media.dtype
+
+#%%
+testbool = data_reader('data/df_rfp_dataset_raw_20181218185047.csv',
+    data_dict='data/data_reference.csv',
+    nrows=100,
+    usecols=['ife', 'e_xtv', 'e_xphone', 'one_media'])
+
+preview(testbool)
+
+#%%
+testbool = pd.read_csv('data/df_rfp_dataset_raw_20181218185047.csv',
+    # data_dict='data/data_reference.csv',
+    nrows=50000, sep=',',
+    usecols=['IFE', 'eXTV', 'eXPhone', 'OneMedia'],
+    dtype={'IFE':'bool', 'e_xtv':'bool', 'e_xphone':'bool', 'one_media':'bool'})
+
+preview(testbool)

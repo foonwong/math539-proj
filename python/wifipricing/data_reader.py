@@ -1,6 +1,7 @@
 import pandas as pd
 import re
 from itertools import compress
+from .sugar import *
 
 def data_reader(data, data_dict, nrows=None, skiprows=None, usecols=None):
     """reading in wifi data as pandas.DataFrame.
