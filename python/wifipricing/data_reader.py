@@ -27,6 +27,7 @@ def data_reader(data, data_dict, nrows=None, skiprows=None, usecols=None):
     if len(badcol) > 0: 
         raise Exception(f"{badcol} not a valid choice. Reference to refence's pandas_name")
 
+    print(f'\nReading {data} with pd.read_csv()...')
     df = pd.read_csv(
         data,
         names = pd_nm, header=1,
@@ -37,42 +38,7 @@ def data_reader(data, data_dict, nrows=None, skiprows=None, usecols=None):
     timecols = [x for x in df.columns if 'time' in x]
     df[timecols] = df[timecols].astype('datetime64')
 
-    df = flight_df_add_features(df)
-
-    return df
-
-
-def flight_df_add_features(df):
-    """Add extra features to wifi dataframe if possible"""
-    try:
-        prod_nm = df['product_name'].unique()
-    except:
-        pass
-
-    try:
-        datacap_dict = {x:get_datacap(x) for x in prod_nm}
-        df['datacap_mb'] = df['product_name'].map(lambda x: datacap_dict[x])
-        df['datacap'] = df['datacap_mb'].notnull()
-    except:
-        pass
-
-    try:
-        timecap_dict = {x:get_timecap(x) for x in prod_nm}
-        df['timecap_min'] = df['product_name'].map(lambda x: timecap_dict[x])
-        df['timecap'] = df['timecap_min'].notnull()
-    except:
-        pass
-
-    try:
-        df['price_per_mb'] = df['price_usd'] / df['datacap_mb']
-        df['price_per_min'] =  df['price_usd'] / df['timecap_min']
-    except:
-        pass
-
-    try:
-        df['profit'] = get_profit(df['price_usd'], df['total_usage_mb'])
-    except:
-        pass
+    df = _flight_df_add_features(df)
 
     return df
 
@@ -137,9 +103,45 @@ def get_product_summary(df_in):
     except:
         pass
 
-    df = flight_df_add_features(df)
+    df = _flight_df_add_features(df)
 
     return df
+
+
+def _flight_df_add_features(df):
+    """Add extra features to wifi dataframe if possible"""
+    try:
+        prod_nm = df['product_name'].unique()
+    except:
+        pass
+
+    try:
+        datacap_dict = {x:get_datacap(x) for x in prod_nm}
+        df['datacap_mb'] = df['product_name'].map(lambda x: datacap_dict[x])
+        df['datacap'] = df['datacap_mb'].notnull()
+        df['price_per_mb'] = df['price_usd'] / df['datacap_mb']
+        print(f'\nAdding datacap_mb and price_usd')
+    except:
+        pass
+
+    try:
+        timecap_dict = {x:get_timecap(x) for x in prod_nm}
+        df['timecap_min'] = df['product_name'].map(lambda x: timecap_dict[x])
+        df['timecap'] = df['timecap_min'].notnull()
+        df['price_per_min'] =  df['price_usd'] / df['timecap_min']
+        print(f'\nAdding timecap_min and price_min')
+    except:
+        pass
+
+    try:
+        df['profit'] = get_profit(df['price_usd'], df['total_usage_mb'])
+        print(f'\nAdding profit (per session)')
+    except:
+        pass
+
+    return df
+
+
 
 
 def get_datacap(x):
