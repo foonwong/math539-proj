@@ -1,4 +1,4 @@
-%%
+#%%
 sys.path.append('python')
 
 
@@ -11,6 +11,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 sns.set(color_codes=True)
+
 
 #%%
 pd.set_option('display.max_columns', 999)
@@ -83,11 +84,15 @@ usecol=[
 df = data_reader(
     "data/df_rfp_dataset_raw_20181218185047.csv",
     "data/data_reference.csv",
+    skiprows=np.random.randint(1, 40000000, 35000000),
     usecols=usecol
 )
 
+#%%
 df.head()
 f'df dimensions: {df.shape}'
+missing_data_report(df)
+
 
 
 #%%
@@ -103,10 +108,19 @@ f'both: {bothcapped} '
 f'None: {nocapped} '
 
 
+#%%
+df['pass_seat_ratio'] = df['total_passengers'] / df['seat_count']
+df['pass_jack_ratio'] = df['total_passengers'] / df['jack_seat_count']
+
+df[df['pass_seat_ratio'] > 1][['aircraft_type', 'total_passengers', 'seat_count']].\
+    pipe(preview)
+
 
 
 #%%
 df_summarized_datacap = df[df['datacap']].pipe(get_product_summary)
+
+#%%
 df_summarized_timecap = df[df['timecap']].pipe(get_product_summary)
 
 nocapcol = [x for x in df.columns if ('cap' not in x) and ('price_per' not in x)]
@@ -127,8 +141,7 @@ df_summarized_timecap.head(5)
 df_summarized_nocap.head(5)
 
 #%%
-df.groupby('product_name').size()
-
+df.groupby(['flight_id', 'product_name']).size().sort_values(ascending=False)
 
 #%%
 p = sns.distplot(df_summarized_datacap['profit_per_psn'])

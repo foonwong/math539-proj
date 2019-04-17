@@ -37,14 +37,14 @@
 35,36,AC Frame,ac_frame,factor,3,Y,What does this mean?,"AC(Aircraft) Fram type , NB(Narrow Body) WB(Wide Body)",c,category,1,"NB, WB"
 36,37,Routes,routes,character,3048,N,,,c,category,1,
 37,38,Price/USD,price_usd,numeric,101,N,,,n,float16,0,
-38,39,IFE,ife,factor,3,Y,What does this mean?,IFE (InFlight Entertainment) often used for the presense of a seatback/media ,c,float8,1,"0, 1"
-39,40,eXTV,e_xtv,factor,3,Y,What does this mean?,Live TV if it is present on flight,c,float8,1,"0, 1"
-40,41,eXPhone,e_xphone,factor,3,Y,What does this mean?,Phone ,c,float8,1,"0, 1"
-41,42,OneMedia,one_media,factor,3,Y,What does this mean?,Advertisement by Panasonic,c,float8,1,"0, 1"
+38,39,IFE,ife,factor,3,Y,What does this mean?,IFE (InFlight Entertainment) often used for the presense of a seatback/media ,c,float16,1,"0, 1"
+39,40,eXTV,e_xtv,factor,3,Y,What does this mean?,Live TV if it is present on flight,c,float16,1,"0, 1"
+40,41,eXPhone,e_xphone,factor,3,Y,What does this mean?,Phone ,c,float16,1,"0, 1"
+41,42,OneMedia,one_media,factor,3,Y,What does this mean?,Advertisement by Panasonic,c,float16,1,"0, 1"
 42,43,Service_count,service_count,numeric,6,Y,What does this mean?,,n,float16,0,"1, 2, 3, 4, 5"
 43,44,Dest_Country,dest_country,factor,138,N,,,c,category,1,
 44,45,Dest_Region,dest_region,factor,10,N,,,c,category,1,"Africa, Americas, Asia, Asia/ Europe, Asia/ Middle East, Europe, Europe/ Africa, Middle East, Oceania"
 45,46,JackSeatCount,jack_seat_count,numeric,65,Y,What does this mean?,Number of total seats on flight from an internal data source called jack ,n,float16,0,"130, 144, 146, 154, 161, 166, 167, 169, 174, 176, 189, 194, 209, 215, 223, 226, 236, 240, 243, 246, 249, 253, 254, 256, 258, 260, 262, 263, 264, 270, 271, 274, 280, 285, 286, 288, 289, 291, 293, 294, 296, 297, 298, 299, 300, 306, 308, 310, 311, 313, 321, 333, 334, 335, 336, 337, 340, 382, 388, 395, 405, 425, 438, 442, 514"
 46,47,Economy_pct,economy_pct,numeric,30,Y,What does this mean?,Percentage of economy seats,n,float16,0,"0, 52, 60, 61, 62, 65, 66, 67, 68, 70, 73, 74, 76, 77, 78, 79, 80, 82, 83, 86, 87, 88, 89, 90, 91, 92, 93, 95, 96, 100"
 47,48,BusPassPercent,bus_pass_percent,numeric,30,Y,What does this mean?,Percent of non economy seats,n,float16,0,"15, 18.4, 19.25, 20.95, 21.8, 22.65, 23.5, 24.35, 25.2, 26.05, 26.9, 29.45, 30.3, 32, 32.85, 33.7, 34.55, 35.4, 37.1, 37.95, 40.5, 42.2, 43.05, 43.9, 44.75, 47.3, 48.15, 49, 55.8, 100"
-48,49,luxury,luxury,factor,3,Y,Would like more details,We have identified luxury airlines,c,float8,1,"0, 1"
+48,49,luxury,luxury,factor,3,Y,Would like more details,We have identified luxury airlines,c,float16,1,"0, 1"
