@@ -77,31 +77,6 @@ def flight_df_add_features(df):
     return df
 
 
-def get_flight_summary(df_detailed):
-    """Summarizing wifi dataframe for a flight level analysis"""
-    df = df_detailed.groupby('flight_id').size().reset_index().drop(columns=0)
-
-    try:
-        df_tr = get_takerate_overall(df_detailed)
-        df = pd.merge(df, df_tr, on=['flight_id', 'total_passengers'], how='left')
-    except:
-        pass
-
-    try:
-        df_du = get_flight_data_mb(df_detailed)
-        df = pd.merge(df, df_du, on=['flight_id'], how='left')
-    except:
-        pass
-
-    try:
-        df_rev = get_flight_revenue(df_detailed)
-        df = pd.merge(df, df_rev, on=['flight_id'], how='left')
-    except:
-        pass
-
-    return df
-
-
 def get_product_summary(df_in):
     """Summarizing wifi dataframe for a product level analysis
 
@@ -116,9 +91,6 @@ def get_product_summary(df_in):
     """
 
     # Check minimum requirements to make product level summary
-    # req_cols = ['flight_id', 'product_name', 'total_passengers', 
-    #     'price_usd', 'price_per_mb', 'price_per_min']
-
     req_cols = ['flight_id', 'product_name', 'total_passengers', 
         'price_usd']
 
@@ -138,7 +110,15 @@ def get_product_summary(df_in):
 	    'ife', 'e_xtv', 'e_xphone', 'one_media', 'dest_country', 'dest_region',
 	    'jack_seat_count', 'economy_pct', 'bus_pass_percent', 'luxury']
 
-    df = distinct(df_in, [x for x in df_in.columns if x in (req_cols + other_cols)])
+    grouping_cols = [x for x in df_in.columns if x in (req_cols + other_cols)] 
+
+    print('''Warning: finding distinct groups for the following features, any rows
+    with missing data will be discarded. Consider imputing if a feature has significant
+    quantity of missing data.''')
+
+    missing_data_report(df_in[grouping_cols])
+
+    df = distinct(df_in, grouping_cols)
 
     try:
         df_du = get_data_per_psn(df_in)
@@ -241,3 +221,28 @@ def get_data_per_psn(df):
         assign(data_per_psn = lambda x: x['data_per_psn'] / x['total_passengers'])
 
     return df_du
+
+
+# def get_flight_summary(df_detailed):
+#     """Summarizing wifi dataframe for a flight level analysis"""
+#     df = df_detailed.groupby('flight_id').size().reset_index().drop(columns=0)
+
+#     try:
+#         df_tr = get_takerate_overall(df_detailed)
+#         df = pd.merge(df, df_tr, on=['flight_id', 'total_passengers'], how='left')
+#     except:
+#         pass
+
+#     try:
+#         df_du = get_flight_data_mb(df_detailed)
+#         df = pd.merge(df, df_du, on=['flight_id'], how='left')
+#     except:
+#         pass
+
+#     try:
+#         df_rev = get_flight_revenue(df_detailed)
+#         df = pd.merge(df, df_rev, on=['flight_id'], how='left')
+#     except:
+#         pass
+
+#     return df
