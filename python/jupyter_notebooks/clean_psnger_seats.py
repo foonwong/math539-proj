@@ -109,7 +109,7 @@ merged[merged.total_passengers_median > merged.seat_count_median]
 # ### Internal function to be used to data reader
 
 #%% 
-def clean_passenger_seat(df):
+def _clean_passenger_seat(df):
     """
     NOTE: MODIFYING INPUT df  
     Imputing and fixing suspect total_passengers and seat_counts
@@ -123,7 +123,9 @@ def clean_passenger_seat(df):
     req_cols = ['aircraft_type', 'airline', 'total_passengers', 'seat_count']
     assert set(req_cols).issubset(set(df.columns)), f"Input is missing one: {req_cols}"
 
-    print('\ninput data:'); missing_data_report(df)
+    print('\nData cleaning on total_passenger and seat_count columns:')
+    print('------------------------------------------------------')
+    print('Input: missing data on total_passengers: {df.total_passengers.count()/df.shape[0]:.2%}')
     print(f"Flights with more passengers than seats: {sum(df['total_passengers']/df['seat_count'] > 1) / df.shape[0]:.2%}")
 
     print('\nimputing total passengers and seat counts by grouped median...')
@@ -141,7 +143,7 @@ def clean_passenger_seat(df):
     df.loc[ind, 'total_passengers'] = gm_ac.loc[ind, 'total_passengers']
     df.loc[ind, 'seat_count'] = gm_ac.loc[ind, 'seat_count']
 
-    print('\nCleaned data:'); missing_data_report(df)
+    print('\nImputed: missing data on total_passengers: {df.total_passengers.count()/df.shape[0]:.2%}')
     print(f"Flights with more passengers than seats: {sum(df['total_passengers']/df['seat_count'] > 1) / df.shape[0]:.2%}")
     return df
 

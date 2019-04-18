@@ -1,9 +1,10 @@
 import pandas as pd
 import re
 from itertools import compress
+from .data_cleaners import clean_wifi_data 
 from .sugar import *
 
-def data_reader(data, data_dict, nrows=None, skiprows=None, usecols=None):
+def data_reader(data, data_dict, cleaning=True, nrows=None, skiprows=None, usecols=None):
     """reading in wifi data as pandas.DataFrame.
 
     Will create new columns for product data/time cap, pricing and profit
@@ -12,6 +13,7 @@ def data_reader(data, data_dict, nrows=None, skiprows=None, usecols=None):
     Keyword arguments:
     data -- path to wifi csv
     data_dict -- path to reference csv with pandas colname and dtype info
+    cleaning -- Clean and impute data. Reference data_cleaners
     nrows -- pd.read_csv nrows. Use None for all rows. (default None)
     skiprows -- pd.read_csv skiprows. 
     usecols -- pd.read_csv usecols. Use None for all cols. (default None)
@@ -38,7 +40,12 @@ def data_reader(data, data_dict, nrows=None, skiprows=None, usecols=None):
     timecols = [x for x in df.columns if 'time' in x]
     df[timecols] = df[timecols].astype('datetime64')
 
-    df = _flight_df_add_features(df)
+    _flight_df_add_features(df)
+
+    if cleaning:
+        clean_wifi_data(df)
+
+    missing_data_report(df)
 
     return df
 
@@ -103,13 +110,17 @@ def get_product_summary(df_in):
     except:
         pass
 
-    df = _flight_df_add_features(df)
+    _flight_df_add_features(df)
 
     return df
 
 
 def _flight_df_add_features(df):
-    """Add extra features to wifi dataframe if possible"""
+    """Add extra features to wifi dataframe if possible
+    (Modifies input dataframe)
+    """
+
+    print(f'\nAdding features\n------------------------------------')
     try:
         prod_nm = df['product_name'].unique()
     except:
@@ -120,7 +131,7 @@ def _flight_df_add_features(df):
         df['datacap_mb'] = df['product_name'].map(lambda x: datacap_dict[x])
         df['datacap'] = df['datacap_mb'].notnull()
         df['price_per_mb'] = df['price_usd'] / df['datacap_mb']
-        print(f'\nAdding datacap_mb and price_usd')
+        print(f'Adding datacap_mb and price_usd')
     except:
         pass
 
@@ -129,19 +140,17 @@ def _flight_df_add_features(df):
         df['timecap_min'] = df['product_name'].map(lambda x: timecap_dict[x])
         df['timecap'] = df['timecap_min'].notnull()
         df['price_per_min'] =  df['price_usd'] / df['timecap_min']
-        print(f'\nAdding timecap_min and price_min')
+        print(f'Adding timecap_min and price_min')
     except:
         pass
 
     try:
         df['profit'] = get_profit(df['price_usd'], df['total_usage_mb'])
-        print(f'\nAdding profit (per session)')
+        print(f'Adding profit (per session)')
     except:
         pass
 
-    return df
-
-
+    return None
 
 
 def get_datacap(x):
@@ -223,6 +232,7 @@ def get_data_per_psn(df):
         assign(data_per_psn = lambda x: x['data_per_psn'] / x['total_passengers'])
 
     return df_du
+
 
 
 # def get_flight_summary(df_detailed):

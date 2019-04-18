@@ -15,8 +15,8 @@ def preview(df, x=5):
 def distinct(df, cols, fillna=True):
     "similar to dplyr's distinct. Find distinct combination of a list of columns"
 
-    out_df = df.copy(deep=True)[cols]
-
+    out_df = df[cols].copy(deep=True)
+    
     if fillna:
         for col in cols:
             if (out_df[col].dtype.name) == 'category':
@@ -60,10 +60,10 @@ def missing_data_report(df):
     prop = 1 - round(df.count().sort_values() / df.shape[0], 4)
     prop = prop[prop > 0]
 
-    print(f'Dataframe dimensions: {df.shape}')
-    print('Missing data:')
+    print('\nMissing data report\n-------------------------------------')
     for i,v in zip(prop.index, prop):
-        print(f'{i}:  {round(v*100, 4)}%')
+        print(f'{i}:\t{v:.4%}')
+    print(f'------------------------------\nDataframe dimensions: {df.shape}')
 
     return None
 
