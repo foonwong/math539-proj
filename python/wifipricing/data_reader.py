@@ -2,7 +2,7 @@ import pandas as pd
 import re
 from itertools import compress
 from .data_cleaners import clean_wifi_data 
-from .sugar import *
+from .sugar import missing_data_report
 
 def data_reader(data, data_dict, cleaning=True, nrows=None, skiprows=None, usecols=None):
     """reading in wifi data as pandas.DataFrame.
@@ -30,6 +30,7 @@ def data_reader(data, data_dict, cleaning=True, nrows=None, skiprows=None, useco
         raise Exception(f"{badcol} not a valid choice. Reference to refence's pandas_name")
 
     print(f'\nReading {data} with pd.read_csv()...')
+
     df = pd.read_csv(
         data,
         names = pd_nm, header=1,
@@ -50,71 +51,6 @@ def data_reader(data, data_dict, cleaning=True, nrows=None, skiprows=None, useco
     return df
 
 
-def get_product_summary(df_in):
-    """Summarizing wifi dataframe for a product level analysis
-
-    Will create new columns for product data/time cap, pricing and profit
-    if possible.
-
-    Note:
-    df_in needs to have at least:
-    ['flight_id', 'product_name', 'total_passengers', 'price_usd', 'price_per_mb', 'price_per_min']
-
-    Columns that are more detailed than flight-product level will be discarded
-    """
-
-    # Check minimum requirements to make product level summary
-    req_cols = ['flight_id', 'product_name', 'total_passengers', 
-        'price_usd']
-
-    missed = [(x not in df_in.columns) for x in req_cols]
-
-    if sum(missed): 
-        raise Exception(f'Input df must have {list(compress(req_cols, missed))}')
-
-
-    # include other columns that do not conflict with product level summary
-    other_cols = ['airline', 'flight_duration_type', 'tail_number',
-	    'aircraft_type', 'origin_iata', 'destination_iata',
-	    'departure_time_utc', 'landing_time_utc', 'departure_time_local',
-	    'landing_time_local', 'flight_duration_hrs', 'antenna_type',
-	    'orig_country', 'orig_region', 'seat_count', 'night_flight',
-	    'flight_type', 'category', 'airline_region', 'ac_frame', 'routes',
-	    'ife', 'e_xtv', 'e_xphone', 'one_media', 'dest_country', 'dest_region',
-	    'jack_seat_count', 'economy_pct', 'bus_pass_percent', 'luxury']
-
-    grouping_cols = [x for x in df_in.columns if x in (req_cols + other_cols)] 
-
-    print('''Warning: finding distinct groups for the following features, any rows
-    with missing data will be discarded. Consider imputing if a feature has significant
-    quantity of missing data.''')
-
-    missing_data_report(df_in[grouping_cols])
-
-    df = distinct(df_in, grouping_cols)
-
-    try:
-        df_du = get_data_per_psn(df_in)
-        df = pd.merge(df, df_du, on=['flight_id', 'product_name', 'total_passengers'], how='left')
-    except:
-        pass
-
-    try:
-        df_rev = get_rev_per_psn(df_in)
-        df = pd.merge(df, df_rev, on=['flight_id', 'product_name'], how='left')
-    except:
-        pass
-
-    try:
-        df['profit_per_psn'] = get_profit(df['revenue_per_psn'], df['data_per_psn'])
-    except:
-        pass
-
-    _flight_df_add_features(df)
-
-    return df
-
-
 def _flight_df_add_features(df):
     """Add extra features to wifi dataframe if possible
     (Modifies input dataframe)
@@ -127,7 +63,7 @@ def _flight_df_add_features(df):
         pass
 
     try:
-        datacap_dict = {x:get_datacap(x) for x in prod_nm}
+        datacap_dict = {x:_get_datacap(x) for x in prod_nm}
         df['datacap_mb'] = df['product_name'].map(lambda x: datacap_dict[x])
         df['datacap'] = df['datacap_mb'].notnull()
         df['price_per_mb'] = df['price_usd'] / df['datacap_mb']
@@ -136,7 +72,7 @@ def _flight_df_add_features(df):
         pass
 
     try:
-        timecap_dict = {x:get_timecap(x) for x in prod_nm}
+        timecap_dict = {x:_get_timecap(x) for x in prod_nm}
         df['timecap_min'] = df['product_name'].map(lambda x: timecap_dict[x])
         df['timecap'] = df['timecap_min'].notnull()
         df['price_per_min'] =  df['price_usd'] / df['timecap_min']
@@ -153,7 +89,7 @@ def _flight_df_add_features(df):
     return None
 
 
-def get_datacap(x):
+def _get_datacap(x):
     """Extract data cap in MB from productname"""
     data = re.search('(?i)[\d]+(?= ?MB)', x)
 
@@ -165,17 +101,7 @@ def get_datacap(x):
     return data
 
 
-def get_profit(revenue, data_mb, cost_per_mb = 0.05):
-    """Calculate profit from revenue and data usage"""
-    try:
-        prof = revenue - data_mb * cost_per_mb
-    except:
-        prof = None
-
-    return prof
-
-
-def get_timecap(x):
+def _get_timecap(x):
     """Extract time cap in min from productname"""
     data = re.search('(?i)([\d]+) ?(min|h)', x)
 
@@ -188,73 +114,3 @@ def get_timecap(x):
         data = None
 
     return data
-
-
-def get_takerate_overall(df):
-    """Returns overall wifi takerate per FlightID"""
-    tr_df = df.\
-        groupby(['flight_id', 'total_passengers']).size().reset_index().rename(columns={0:'totalsessions'}).\
-        assign(flight_takerate = lambda x: x['total_sessions'] / x['total_passengers'])
-
-    return tr_df
-
-
-def get_flight_revenue(df):
-    "Returns overall revenue per FlightID"
-    df_rev = df.groupby('flight_id')['price_usd'].sum().\
-        reset_index().rename(columns={'price_usd':'flight_revenue_usd'})
-
-    return df_rev
-
-
-def get_flight_data_mb(df):
-    """Returns overall datausage per FlightID"""
-    df_du = df.groupby('flight_id')['total_usage_mb'].sum().\
-        reset_index().rename(columns={'total_usage_mb':'flight_data_mb'})
-
-    return df_du
-
-
-def get_rev_per_psn(df):
-    "Returns revenue per product per head"
-    df_rev = df.groupby(['flight_id', 'product_name', 'total_passengers'])['price_usd'].sum().\
-        reset_index().\
-        assign(revenue_per_psn = lambda x: x['price_usd'] / x['total_passengers']).\
-        drop(columns=['price_usd', 'total_passengers'])
-
-    return df_rev
-
-
-def get_data_per_psn(df):
-    """Returns overall datausage per product per head on a flight"""
-    df_du = df.groupby(['flight_id', 'product_name', 'total_passengers'])['total_usage_mb'].sum().\
-        reset_index().rename(columns={'total_usage_mb':'data_per_psn'}).\
-        assign(data_per_psn = lambda x: x['data_per_psn'] / x['total_passengers'])
-
-    return df_du
-
-
-
-# def get_flight_summary(df_detailed):
-#     """Summarizing wifi dataframe for a flight level analysis"""
-#     df = df_detailed.groupby('flight_id').size().reset_index().drop(columns=0)
-
-#     try:
-#         df_tr = get_takerate_overall(df_detailed)
-#         df = pd.merge(df, df_tr, on=['flight_id', 'total_passengers'], how='left')
-#     except:
-#         pass
-
-#     try:
-#         df_du = get_flight_data_mb(df_detailed)
-#         df = pd.merge(df, df_du, on=['flight_id'], how='left')
-#     except:
-#         pass
-
-#     try:
-#         df_rev = get_flight_revenue(df_detailed)
-#         df = pd.merge(df, df_rev, on=['flight_id'], how='left')
-#     except:
-#         pass
-
-#     return df
