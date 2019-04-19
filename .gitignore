@@ -6,9 +6,10 @@
 .Ruserdata
 cache
 **df_rfp_dataset_raw*.csv
+**df*.csv
 **userflight*.csv
 **flight_stats*.csv
-
+data/summarized_data**
 *.pyc
 *.ipynb_checkpoints
 **pycache
