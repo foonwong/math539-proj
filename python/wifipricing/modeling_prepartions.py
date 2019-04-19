@@ -12,9 +12,8 @@ def get_lgb_df(summarized_df):
     return None
 
 
-
-def get_splitted_wifi_data(wifi_path, ref_path, nrows=None):
-    input_col=['product_name', 'flight_id', 'airline', 'aircraft_type',
+def get_splitted_wifi_data(wifi_path, ref_path, nrows=None, dropcols=True):
+    input_col=['product_name', 'price_usd', 'flight_id', 'airline', 'aircraft_type',
         'flight_duration_hrs', 'total_usage_mb', 'seat_count', 'total_passengers',
         'night_flight', 'flight_type', 'price_usd', 'ife', 'e_xtv', 'e_xphone',
         'one_media', 'jack_seat_count', 'economy_pct', 'bus_pass_percent',
@@ -27,19 +26,24 @@ def get_splitted_wifi_data(wifi_path, ref_path, nrows=None):
     drop_cols = ['aircraft_type']
     df = df.drop(columns=drop_cols)
 
+    # if drop_cols:
+    #     missing_data_report(df)
+    #     print('Columns with missing values will be dropped')
+    #     df_out = df_out.dropna(axis='columns')
+
     df_datacap = df[df['datacap']].pipe(get_product_summary)
     df_timecap = df[df['timecap']].pipe(get_product_summary)
 
     nocapcol = [x for x in df.columns if ('cap' not in x) and ('price_per' not in x)]
-    df_nocap= df[~(df['datacap'] | df['timecap'])][nocapcol].\
-        pipe(get_product_summary)
+    df_nocap= df[~(df['datacap'] | df['timecap'])]\
+        .pipe(get_product_summary)
 
     df_all = get_product_summary(df)
 
     return [df_datacap, df_timecap, df_nocap, df_all] 
 
 
-def get_product_summary(df_in, drop_cols=True):
+def get_product_summary(df_in):
     """Summarizing wifi dataframe for a product level analysis
 
     Will create new columns for product data/time cap, pricing and profit
@@ -90,7 +94,13 @@ def get_product_summary(df_in, drop_cols=True):
 
     try:
         df_rev = _get_rev_per_psn(df_in)
-        df_out = pd.merge(df_out, df_rev, on=['flight_id', 'product_name'], how='left')
+        df_out = pd.merge(df_out, df_rev, on=['flight_id', 'product_name', 'total_passengers'], how='left')
+    except:
+        pass
+
+    try:
+        df_tr = _get_takerate(df_in)
+        df_out = pd.merge(df_out, df_tr, on=['flight_id', 'product_name', 'total_passengers'], how='left')
     except:
         pass
 
@@ -101,32 +111,34 @@ def get_product_summary(df_in, drop_cols=True):
 
     _flight_df_add_features(df_out)
 
-    print('\n------------------\n Grouped data:')
-    missing_data_report(df_out)
-
-    if drop_cols:
-        print('Columns with missing values will be dropped')
-        df_out = df_out.dropna(axis='columns')
-        print(f'Final dataframe dimensions: {df_out.shape}')
 
     return df_out
 
 
 def _get_rev_per_psn(df):
     "Returns revenue per product per head"
-    df_rev = df.groupby(['flight_id', 'product_name', 'total_passengers'])['price_usd'].sum().\
-        reset_index().\
-        assign(revenue_per_psn = lambda x: x['price_usd'] / x['total_passengers']).\
-        drop(columns=['price_usd', 'total_passengers'])
+    df_rev = df.groupby(['flight_id', 'product_name', 'total_passengers'])['price_usd'].sum()\
+        .reset_index()\
+        .rename(columns={'price_usd':'total_revenue_usd'})\
+        .assign(revenue_per_psn = lambda x: x['total_revenue_usd'] / x['total_passengers'])
 
     return df_rev
 
 
 def _get_data_per_psn(df):
     """Returns overall datausage per product per head on a flight"""
-    df_du = df.groupby(['flight_id', 'product_name', 'total_passengers'])['total_usage_mb'].sum().\
-        reset_index().rename(columns={'total_usage_mb':'data_per_psn'}).\
-        assign(data_per_psn = lambda x: x['data_per_psn'] / x['total_passengers'])
+    df_du = df.groupby(['flight_id', 'product_name', 'total_passengers'])['total_usage_mb'].sum()\
+        .reset_index()\
+        .assign(data_per_psn = lambda x: x['total_usage_mb'] / x['total_passengers'])
+
+    return df_du
+
+
+def _get_takerate(df):
+    """Returns takerate per product on a flight"""
+    df_du = df.groupby(['flight_id', 'product_name', 'total_passengers']).apply(lambda x: x.shape[0])\
+        .reset_index().rename(columns={0:'purchase_count'})\
+        .assign(takerate = lambda x: x['purchase_count'] / x['total_passengers'])
 
     return df_du
 
