@@ -1,10 +1,10 @@
 #%%
-N_HYPER = 400 
+# N_HYPER = 30 
 SEED = 1337
 DEVICE = 'gpu'
 N_JOBS = 4 
 N_ROWS= None
-# N_ROWS= 10000
+# N_ROWS= 1000
 
 
 #%%
@@ -80,78 +80,101 @@ print('\n\nX test\n', X_test.dtypes)
 #n_estimators is set to a "large value". The actual number of trees build will depend on early stopping and 5000 define only the absolute maximum
 lgb_reg = lgb.LGBMRegressor(
     random_state=SEED, 
-    n_jobs=4,
-    device=DEVICE,
+    n_jobs=N_JOBS, 
+    device=DEVICE, 
     n_estimators=1000
-    # max_bin=63
 )
 
+def LGB_RandCV(params, n_hyper):
+    rcv = RandomizedSearchCV(
+        estimator=lgb_reg, 
+        param_distributions=params, 
+        n_iter=n_hyper,
+        n_jobs=1,
+        cv=3,
+        random_state=SEED,
+        verbose=20
+    )
+
+    return rcv
+
+def LGB_GridCV(params):
+    gcv = GridSearchCV(
+        estimator=lgb_reg, 
+        param_grid=params, 
+        n_jobs=1,
+        cv=3,
+        verbose=20
+    )
+
+    return gcv
+
 #This parameter defines the number of HP points to be tested
-hyper_grid = {
-    'num_leaves': np.arange(5, 300, 3),
-    'min_child_samples': np.arange(100, 3000, 100),
-    'min_child_weight': np.logspace(-5, 4, 10),
-    'subsample': np.linspace(0.2, 1, 15),
-    'colsample_bytree': np.linspace(0.45, 1, 15),
-    'reg_lambda': np.logspace(-1, 3, 15)
+hyper_grid_1 = {
+    'num_leaves': np.arange(3, 20, 1),
+    'min_child_samples': np.arange(300, 3000, 20),
 }
+
+hyper_grid_2 = {
+    'min_child_weight': np.logspace(-5, 4, 50)
+}
+
+hyper_grid_3 = {
+    'subsample': np.linspace(0.2, 1, 15),
+    'colsample_bytree': np.linspace(0.40, 1, 15),
+    'reg_lambda': np.logspace(-2, 3, 40)
+}
+
 
 # This passes additional args that are not in LGBMModel args
 fit_params={
     'eval_set' : [(X_test,y_test)],
     'eval_names': ['valid'],
-    'early_stopping_rounds':30,
+    'early_stopping_rounds':20,
     'categorical_feature': 'auto',
-    'verbose':[1000],
+    'verbose':[1000]
 }
-
-rcv = RandomizedSearchCV(
-    estimator=lgb_reg, 
-    param_distributions=hyper_grid, 
-    n_iter=N_HYPER,
-    cv=3,
-    random_state=SEED,
-    verbose=15
-)
 
 print(f'\n\n Fitting training data size: {X_train.shape}')
 
 import time
 start = time.time()
-rcv = rcv.fit(X_train, y_train, **fit_params)
-end = time.time()
+print(f'\n\n Round 1: {hyper_grid_1}')
+lgb_tune_1 = LGB_RandCV(hyper_grid_1,  100).fit(X_train, y_train, **fit_params)
 
+for k, y in lgb_tune_1.best_params_.items():
+    hyper_grid_2.update({k: [y]})
+
+print(f'\n\n Round 2: {hyper_grid_2}')
+lgb_tune_2 = LGB_GridCV(hyper_grid_2).fit(X_train, y_train, **fit_params)
+
+for k, y in lgb_tune_2.best_params_.items():
+    hyper_grid_3.update({k: [y]})
+
+print(f'\n\n Round 3: {hyper_grid_3}')
+lgb_tune_3 = LGB_RandCV(hyper_grid_3,  100).fit(X_train, y_train, **fit_params)
+end = time.time()
 print(f'Fitting took {round(end - start / 60)} minutes')
 
-
 #%%
-print(f'MAE train: {mean_absolute_error(y_train, rcv.predict(X_train))}')
-print(f'RMSE train: {sqrt(mean_squared_error(y_train, rcv.predict(X_train)))}')
-print(f'\nMAE validate: {mean_absolute_error(y_test, rcv.predict(X_test))}')
-print(f'RMSE validate: {sqrt(mean_squared_error(y_test, rcv.predict(X_test)))} ')
+print(f'MAE train: {mean_absolute_error(y_train, lgb_tune_3.predict(X_train))}')
+print(f'RMSE train: {sqrt(mean_squared_error(y_train, lgb_tune_3.predict(X_train)))}')
+print(f'\nMAE validate: {mean_absolute_error(y_test, lgb_tune_3.predict(X_test))}')
+print(f'RMSE validate: {sqrt(mean_squared_error(y_test, lgb_tune_3.predict(X_test)))} ')
 
-print(f'Restults: {rcv.cv_results_}')
-print(f'best parameters: {rcv.best_params_}')
-print(f'best scores: {rcv.best_score_}')
 
 from datetime import datetime
-file = 'models/lgb_grid_random_' + datetime.now().strftime("%Y%m%d_%H_%M") + ".joblib"
-
-joblib.dump(rcv,  file)
-
-#%%
 from sklearn.externals import joblib
-rcv = joblib.load("models/lgb_grid_random_20190419_23_27.joblib")
-scores = rcv.cv_results_['mean_test_score']
+file = 'models/lgb_grid_iterative' + datetime.now().strftime("%Y%m%d_%H_%M") + ".joblib"
+joblib.dump(lgb_tune_3,  file)
+
+scores = lgb_tune_3.cv_results_['mean_test_score']
 score_sorted = scores.argsort()
 score_sorted
 
 for i, ind in enumerate(score_sorted):
-        print(i)
-        print(rcv.cv_results_['params'][ind])
+        print(f"\nParams {i}\n", lgb_tune_3.cv_results_['params'][ind])
+        print('Mean test score: ' ,lgb_tune_3.cv_results_['mean_test_score'][ind])
 
         if i > 5:
             break
-
-
-#%%

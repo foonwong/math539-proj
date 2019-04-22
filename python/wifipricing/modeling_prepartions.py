@@ -40,7 +40,7 @@ def get_splitted_wifi_data(wifi_path, ref_path, nrows=None, dropcols=True):
 
     df_all = get_product_summary(df)
 
-    return [df_datacap, df_timecap, df_nocap, df_all] 
+    return {'datacap':df_datacap, 'timecap':df_timecap, 'nocap':df_nocap, 'all':df_all} 
 
 
 def get_product_summary(df_in):

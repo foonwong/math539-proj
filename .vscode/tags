@@ -1,0 +1,186 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	/45968eff/
+DEVICE	../python/jupyter_notebooks/demand_model_input_random.py	/^DEVICE = 'gpu'$/;"	kind:variable	line:4
+DEVICE	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^DEVICE = 'gpu'$/;"	kind:variable	line:4
+N_HYPER	../python/jupyter_notebooks/demand_model_input_random.py	/^N_HYPER = 10 $/;"	kind:variable	line:2
+N_HYPER	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^N_HYPER = 10 $/;"	kind:variable	line:2
+N_JOBS	../python/jupyter_notebooks/demand_model_input_random.py	/^N_JOBS = 4 $/;"	kind:variable	line:5
+N_JOBS	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^N_JOBS = 4 $/;"	kind:variable	line:5
+N_ROWS	../python/jupyter_notebooks/demand_model_input_random.py	/^N_ROWS= 500000$/;"	kind:variable	line:7
+N_ROWS	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^N_ROWS= None$/;"	kind:variable	line:6
+SEED	../python/jupyter_notebooks/demand_model_input_random.py	/^SEED = 1337$/;"	kind:variable	line:3
+SEED	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^SEED = 1337$/;"	kind:variable	line:3
+X	../python/jupyter_notebooks/unused.py	/^X = df_summarized_datacap.drop(columns=drop_cols)$/;"	kind:variable	line:153
+X	../python/jupyter_notebooks/unused.py	/^X = df_summarized_datacap.drop(columns=drop_cols).pipe(pd.get_dummies)$/;"	kind:variable	line:97
+X_test	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^X_train, X_test, y_train, y_test = train_test_split(lgb_data['data'], $/;"	kind:variable	line:79
+X_test	../python/jupyter_notebooks/unused.py	/^X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)$/;"	kind:variable	line:124
+X_test	../python/jupyter_notebooks/unused.py	/^X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)$/;"	kind:variable	line:179
+X_train	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^X_train, X_test, y_train, y_test = train_test_split(lgb_data['data'], $/;"	kind:variable	line:79
+X_train	../python/jupyter_notebooks/unused.py	/^X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)$/;"	kind:variable	line:124
+X_train	../python/jupyter_notebooks/unused.py	/^X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)$/;"	kind:variable	line:179
+__init__.py	../python/wifipricing/__init__.py	1;"	kind:file	line:1
+_check_capped_sessions	../python/wifipricing/modeling_prepartions.py	/^def _check_capped_sessions(df):$/;"	kind:function	line:146
+_clean_flight_type	../python/wifipricing/data_cleaners.py	/^def _clean_flight_type(df):$/;"	kind:function	line:69
+_clean_passenger_seat	../python/jupyter_notebooks/clean_psnger_seats.py	/^def _clean_passenger_seat(df):$/;"	kind:function	line:112
+_clean_passenger_seat	../python/wifipricing/data_cleaners.py	/^def _clean_passenger_seat(df):$/;"	kind:function	line:31
+_clean_redeye	../python/wifipricing/data_cleaners.py	/^def _clean_redeye(df):$/;"	kind:function	line:89
+_default_booleans	../python/wifipricing/data_cleaners.py	/^def _default_booleans(df):$/;"	kind:function	line:98
+_flight_df_add_features	../python/wifipricing/data_reader.py	/^def _flight_df_add_features(df):$/;"	kind:function	line:54
+_get_data_per_psn	../python/wifipricing/modeling_prepartions.py	/^def _get_data_per_psn(df):$/;"	kind:function	line:128
+_get_datacap	../python/wifipricing/data_reader.py	/^def _get_datacap(x):$/;"	kind:function	line:92
+_get_rev_per_psn	../python/wifipricing/modeling_prepartions.py	/^def _get_rev_per_psn(df):$/;"	kind:function	line:118
+_get_takerate	../python/wifipricing/modeling_prepartions.py	/^def _get_takerate(df):$/;"	kind:function	line:137
+_get_timecap	../python/wifipricing/data_reader.py	/^def _get_timecap(x):$/;"	kind:function	line:104
+_missing_message	../python/wifipricing/data_cleaners.py	/^def _missing_message(df, col):$/;"	kind:function	line:110
+ac_al	../python/jupyter_notebooks/clean_psnger_seats.py	/^ac_al = distinct(df[df['pass_seat_ratio'] > 1], ['aircraft_type', 'airline']) $/;"	kind:variable	line:93
+airline_prod.py	../python/jupyter_notebooks/airline_prod.py	1;"	kind:file	line:1
+capped_perc	../python/jupyter_notebooks/airline_prod.py	/^capped_perc = round(data_levels\/price_levels * 100, 2)$/;"	kind:variable	line:77
+capped_ses	../python/jupyter_notebooks/airline_prod.py	/^capped_ses = round(not_nulls \/ df_price_cap.shape[0] *100, 2)$/;"	kind:variable	line:81
+cat_ref	../python/jupyter_notebooks/unused.py	/^cat_ref = dict()$/;"	kind:variable	line:110
+cat_ref	../python/jupyter_notebooks/unused.py	/^cat_ref = dict()$/;"	kind:variable	line:163
+cats	../python/jupyter_notebooks/unused.py	/^cats = [nm for nm, typ in zip(X, X.dtypes) if typ.name=='category']$/;"	kind:variable	line:107
+cats	../python/jupyter_notebooks/unused.py	/^cats = [nm for nm, typ in zip(X, X.dtypes) if typ.name=='category']$/;"	kind:variable	line:160
+clean_df	../python/jupyter_notebooks/clean_psnger_seats.py	/^clean_df = clean_passenger_seat(df[['aircraft_type', 'airline', 'total_passengers', 'seat_count'/;"	kind:variable	line:152
+clean_psnger_seats.py	../python/jupyter_notebooks/clean_psnger_seats.py	1;"	kind:file	line:1
+clean_wifi_data	../python/wifipricing/data_cleaners.py	/^def clean_wifi_data(df):$/;"	kind:function	line:6
+coef	../python/jupyter_notebooks/unused.py	/^coef = lasso_cv.coef_$/;"	kind:variable	line:135
+data_cleaners.py	../python/wifipricing/data_cleaners.py	1;"	kind:file	line:1
+data_levels	../python/jupyter_notebooks/airline_prod.py	/^data_levels = df_price_cap.groupby(['price_usd', 'datacap_mb']).size().shape[0]$/;"	kind:variable	line:76
+data_reader	../python/wifipricing/data_reader.py	/^def data_reader(data, data_dict, cleaning=True, nrows=None, skiprows=None, usecols=None):$/;"	kind:function	line:7
+data_reader.py	../python/wifipricing/data_reader.py	1;"	kind:file	line:1
+demand_model_input_random.py	../python/jupyter_notebooks/demand_model_input_random.py	1;"	kind:file	line:1
+df	../python/jupyter_notebooks/clean_psnger_seats.py	/^df = data_reader($/;"	kind:variable	line:48
+df_airline_product	../python/jupyter_notebooks/test_notebook.py	/^df_airline_product = data_reader($/;"	kind:variable	line:18
+df_all	../python/jupyter_notebooks/get_splitted_data.py	/^df_data, df_time, df_none, df_all = get_splitted_wifi_data($/;"	kind:variable	line:35
+df_all	../python/jupyter_notebooks/making_plots.py	/^df_all = pd.read_csv('data\/summarized_data\/summarized_all.csv')$/;"	kind:variable	line:37
+df_data	../python/jupyter_notebooks/demand_model_input_random.py	/^df_data = pd.read_csv('data\/summarized_data\/summarized_datacap.csv')$/;"	kind:variable	line:26
+df_data	../python/jupyter_notebooks/get_splitted_data.py	/^df_data, df_time, df_none, df_all = get_splitted_wifi_data($/;"	kind:variable	line:35
+df_data	../python/jupyter_notebooks/making_plots.py	/^df_data = pd.read_csv('data\/summarized_data\/summarized_datacap.csv')$/;"	kind:variable	line:35
+df_none	../python/jupyter_notebooks/get_splitted_data.py	/^df_data, df_time, df_none, df_all = get_splitted_wifi_data($/;"	kind:variable	line:35
+df_price_cap	../python/jupyter_notebooks/airline_prod.py	/^df_price_cap = data_reader($/;"	kind:variable	line:29
+df_prod_summary	../python/jupyter_notebooks/airline_prod.py	/^df_prod_summary = df_price_cap.\\$/;"	kind:variable	line:240
+df_time	../python/jupyter_notebooks/get_splitted_data.py	/^df_data, df_time, df_none, df_all = get_splitted_wifi_data($/;"	kind:variable	line:35
+df_time	../python/jupyter_notebooks/making_plots.py	/^df_time = pd.read_csv('data\/summarized_data\/summarized_timecap.csv')$/;"	kind:variable	line:36
+distinct	../python/wifipricing/sugar.py	/^def distinct(df, cols, fillna=True):$/;"	kind:function	line:15
+drop_cols	../python/jupyter_notebooks/unused.py	/^drop_cols = ['product_name', 'flight_id', 'data_per_psn', 'revenue_per_psn', 'total_passengers',/;"	kind:variable	line:152
+drop_cols	../python/jupyter_notebooks/unused.py	/^drop_cols = ['product_name', 'flight_id', 'data_per_psn', 'revenue_per_psn', 'total_passengers',/;"	kind:variable	line:96
+fimp	../python/jupyter_notebooks/unused.py	/^fimp = pd.DataFrame(data={'feat':X.columns, 'coef':coef}).sort_values('coef', ascending=False)$/;"	kind:variable	line:143
+fit_params	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^fit_params={$/;"	kind:variable	line:104
+fitting_tuned_lgb.py	../python/jupyter_notebooks/fitting_tuned_lgb.py	1;"	kind:file	line:1
+g	../python/jupyter_notebooks/making_plots.py	/^g = sns.FacetGrid(df_all, row='datacap', col='timecap', $/;"	kind:variable	line:65
+g	../python/jupyter_notebooks/making_plots.py	/^g = sns.FacetGrid(df_all.sample(10000), row='datacap', col='timecap', $/;"	kind:variable	line:73
+get_categorical_columns	../python/wifipricing/sugar.py	/^def get_categorical_columns(df):$/;"	kind:function	line:44
+get_columns_by_type	../python/wifipricing/sugar.py	/^def get_columns_by_type(df, types='.'):$/;"	kind:function	line:51
+get_lgb_data	../python/jupyter_notebooks/demand_model_input_random.py	/^def get_lgb_data(df_summarized):$/;"	kind:function	line:32
+get_lgb_data	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^def get_lgb_data(df_summarized):$/;"	kind:function	line:29
+get_lgb_df	../python/wifipricing/modeling_prepartions.py	/^def get_lgb_df(summarized_df):$/;"	kind:function	line:10
+get_product_summary	../python/wifipricing/modeling_prepartions.py	/^def get_product_summary(df_in):$/;"	kind:function	line:46
+get_profit	../python/wifipricing/wifi_calculations.py	/^def get_profit(revenue, data_mb, cost_per_mb = 0.05):$/;"	kind:function	line:1
+get_splitted_data.py	../python/jupyter_notebooks/get_splitted_data.py	1;"	kind:file	line:1
+get_splitted_wifi_data	../python/wifipricing/modeling_prepartions.py	/^def get_splitted_wifi_data(wifi_path, ref_path, nrows=None, dropcols=True):$/;"	kind:function	line:15
+gridParams	../models/lgb_grid_1.py	/^gridParams = {$/;"	kind:variable	line:1
+gridParams	../python/jupyter_notebooks/unused.py	/^gridParams = {$/;"	kind:variable	line:233
+grp_means	../python/jupyter_notebooks/clean_psnger_seats.py	/^grp_means = pd.merge(ac_al, df, how='inner').\\$/;"	kind:variable	line:95
+grp_means	../python/jupyter_notebooks/clean_psnger_seats.py	/^grp_means = pd.merge(problem_ac, df, how='inner').\\$/;"	kind:variable	line:82
+hmm	../python/jupyter_notebooks/airline_prod.py	/^hmm = distinct(df_prod_summary, ['flight_id', 'product_name', 'price_per_mb']).\\$/;"	kind:variable	line:279
+is_subset	../python/wifipricing/sugar.py	/^def is_subset(x, y):$/;"	kind:function	line:71
+lasso_cv	../python/jupyter_notebooks/unused.py	/^lasso_cv = linear_model.LassoCV(n_alphas=30)$/;"	kind:variable	line:130
+lgb	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^import lightgbm as lgb$/;"	kind:namespace	line:73
+lgb_data	../python/jupyter_notebooks/demand_model_input_random.py	/^lgb_data = get_lgb_data(df_data)$/;"	kind:variable	line:73
+lgb_data	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^lgb_data = get_lgb_data(lgb_data)$/;"	kind:variable	line:62
+lgb_data	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^lgb_data = pd.read_csv('data\/summarized_data\/summarized_all.csv', nrows=N_ROWS)$/;"	kind:variable	line:26
+lgb_grid	../models/lgb_grid_1.py	/^lgb_grid = GridSearchCV(lgb_reg, gridParams,$/;"	kind:variable	line:19
+lgb_grid	../python/jupyter_notebooks/unused.py	/^lgb_grid = GridSearchCV(lgb_reg, gridParams,$/;"	kind:variable	line:258
+lgb_grid_1.py	../models/lgb_grid_1.py	1;"	kind:file	line:1
+lgb_reg	../models/lgb_grid_1.py	/^lgb_reg = LGBMRegressor(task='train',$/;"	kind:variable	line:11
+lgb_reg	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^lgb_reg = lgb.LGBMRegressor($/;"	kind:variable	line:95
+lgb_reg	../python/jupyter_notebooks/unused.py	/^lgb_reg = LGBMRegressor(task='train',$/;"	kind:variable	line:245
+lgbm_reg	../python/jupyter_notebooks/unused.py	/^lgbm_reg = LGBMRegressor(device='gpu', silent=False)$/;"	kind:variable	line:189
+making_plots.py	../python/jupyter_notebooks/making_plots.py	1;"	kind:file	line:1
+merged	../python/jupyter_notebooks/clean_psnger_seats.py	/^merged = pd.merge(prob, grp_means)$/;"	kind:variable	line:100
+merged	../python/jupyter_notebooks/clean_psnger_seats.py	/^merged = pd.merge(prob, grp_means)$/;"	kind:variable	line:87
+missing_data_report	../python/wifipricing/sugar.py	/^def missing_data_report(df):$/;"	kind:function	line:59
+modeling_prepartions.py	../python/wifipricing/modeling_prepartions.py	1;"	kind:file	line:1
+move_target_to_end	../python/wifipricing/sugar.py	/^def move_target_to_end(df, target):$/;"	kind:function	line:36
+mpl	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^import matplotlib as mpl$/;"	kind:namespace	line:139
+nms	../python/jupyter_notebooks/get_splitted_data.py	/^nms = ['df_data', 'df_time', 'df_none', 'df_all']$/;"	kind:variable	line:41
+not_nulls	../python/jupyter_notebooks/airline_prod.py	/^not_nulls = df_price_cap.count()['datacap_mb']$/;"	kind:variable	line:79
+np	../python/jupyter_notebooks/airline_prod.py	/^import numpy as np$/;"	kind:namespace	line:7
+np	../python/jupyter_notebooks/clean_psnger_seats.py	/^import numpy as np$/;"	kind:namespace	line:11
+np	../python/jupyter_notebooks/demand_model_input_random.py	/^import numpy as np$/;"	kind:namespace	line:14
+np	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^import numpy as np$/;"	kind:namespace	line:14
+np	../python/jupyter_notebooks/get_splitted_data.py	/^import numpy as np$/;"	kind:namespace	line:6
+np	../python/jupyter_notebooks/making_plots.py	/^import numpy as np$/;"	kind:namespace	line:9
+np	../python/jupyter_notebooks/test_notebook.py	/^import numpy as np$/;"	kind:namespace	line:8
+nums	../python/jupyter_notebooks/unused.py	/^nums = [nm for nm, typ in zip(X, X.dtypes) if re.search('float', typ.name)]$/;"	kind:variable	line:108
+nums	../python/jupyter_notebooks/unused.py	/^nums = [nm for nm, typ in zip(X, X.dtypes) if re.search('float', typ.name)]$/;"	kind:variable	line:161
+opt_param	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^opt_param = {$/;"	kind:variable	line:85
+over_25	../python/jupyter_notebooks/airline_prod.py	/^over_25 = df_price_cap.query('price_usd > 25').shape[0]$/;"	kind:variable	line:221
+over_50	../python/jupyter_notebooks/airline_prod.py	/^over_50 = df_price_cap.query('price_usd > 50').shape[0]$/;"	kind:variable	line:220
+p	../python/jupyter_notebooks/airline_prod.py	/^p = df_price_cap.groupby(['airline', 'routes', 'product_name']).size().\\$/;"	kind:variable	line:99
+p	../python/jupyter_notebooks/airline_prod.py	/^p = df_price_cap.groupby(['flight_id', 'product_name']).size().\\$/;"	kind:variable	line:115
+p	../python/jupyter_notebooks/airline_prod.py	/^p = df_price_cap.query('datacap_mb > 0').\\$/;"	kind:variable	line:123
+p	../python/jupyter_notebooks/airline_prod.py	/^p = sns.distplot(df_price_cap['price_per_mb'].dropna(), )$/;"	kind:variable	line:89
+p	../python/jupyter_notebooks/airline_prod.py	/^p = sns.jointplot($/;"	kind:variable	line:162
+p	../python/jupyter_notebooks/airline_prod.py	/^p = sns.jointplot($/;"	kind:variable	line:171
+p	../python/jupyter_notebooks/airline_prod.py	/^p = sns.jointplot($/;"	kind:variable	line:183
+p	../python/jupyter_notebooks/airline_prod.py	/^p = sns.jointplot($/;"	kind:variable	line:194
+p	../python/jupyter_notebooks/airline_prod.py	/^p = sns.scatterplot($/;"	kind:variable	line:205
+p	../python/jupyter_notebooks/making_plots.py	/^p = sns.distplot(smp_df_all.data_per_psn)$/;"	kind:variable	line:81
+p	../python/jupyter_notebooks/making_plots.py	/^p = sns.distplot(smp_df_all.price_usd)$/;"	kind:variable	line:91
+p	../python/jupyter_notebooks/making_plots.py	/^p = sns.distplot(smp_df_all.revenue_per_psn)$/;"	kind:variable	line:86
+p	../python/jupyter_notebooks/making_plots.py	/^p = sns.scatterplot(smp_df_all.price_usd, smp_df_all.profit_per_psn, hue=smp_df_all.datacap_mb)$/;"	kind:variable	line:96
+p	../python/jupyter_notebooks/unused.py	/^p = sns.barplot(x='feat', y='coef', data=fimp.iloc[:20, ])$/;"	kind:variable	line:145
+params	../python/jupyter_notebooks/unused.py	/^params = {$/;"	kind:variable	line:214
+pd	../python/jupyter_notebooks/airline_prod.py	/^import pandas as pd$/;"	kind:namespace	line:8
+pd	../python/jupyter_notebooks/clean_psnger_seats.py	/^import pandas as pd$/;"	kind:namespace	line:12
+pd	../python/jupyter_notebooks/demand_model_input_random.py	/^import pandas as pd$/;"	kind:namespace	line:15
+pd	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^import pandas as pd$/;"	kind:namespace	line:15
+pd	../python/jupyter_notebooks/get_splitted_data.py	/^import pandas as pd$/;"	kind:namespace	line:7
+pd	../python/jupyter_notebooks/making_plots.py	/^import pandas as pd$/;"	kind:namespace	line:10
+pd	../python/jupyter_notebooks/test_notebook.py	/^import pandas as pd$/;"	kind:namespace	line:9
+pd	../python/wifipricing/data_cleaners.py	/^import pandas as pd$/;"	kind:namespace	line:1
+pd	../python/wifipricing/data_reader.py	/^import pandas as pd$/;"	kind:namespace	line:1
+pd	../python/wifipricing/modeling_prepartions.py	/^import pandas as pd$/;"	kind:namespace	line:1
+pd	../python/wifipricing/sugar.py	/^import pandas as pd$/;"	kind:namespace	line:2
+plt	../python/jupyter_notebooks/airline_prod.py	/^import matplotlib.pyplot as plt$/;"	kind:namespace	line:10
+plt	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^import matplotlib.pyplot as plt$/;"	kind:namespace	line:129
+plt	../python/jupyter_notebooks/making_plots.py	/^import matplotlib.pyplot as plt$/;"	kind:namespace	line:12
+pred	../python/jupyter_notebooks/unused.py	/^pred = lgbm_reg.predict(X_test)$/;"	kind:variable	line:201
+preview	../python/wifipricing/sugar.py	/^def preview(df, x=5):$/;"	kind:function	line:5
+price_levels	../python/jupyter_notebooks/airline_prod.py	/^price_levels = df_price_cap.groupby(['price_usd', 'product_name']).size().shape[0]$/;"	kind:variable	line:75
+prob	../python/jupyter_notebooks/clean_psnger_seats.py	/^prob = distinct(df[df['pass_seat_ratio'] > 1], ['aircraft_type', 'airline', 'total_passengers', /;"	kind:variable	line:99
+prob	../python/jupyter_notebooks/clean_psnger_seats.py	/^prob = distinct(df[df['pass_seat_ratio'] > 1], ['aircraft_type', 'total_passengers', 'seat_count/;"	kind:variable	line:86
+problem_ac	../python/jupyter_notebooks/clean_psnger_seats.py	/^problem_ac = distinct(df[df['pass_seat_ratio'] > 1], ['aircraft_type']) $/;"	kind:variable	line:80
+prod_quantile	../python/jupyter_notebooks/airline_prod.py	/^prod_quantile = df_prod_summary.quantile(.99)$/;"	kind:variable	line:250
+prop_1gb	../python/jupyter_notebooks/airline_prod.py	/^prop_1gb = round(sum(df_price_cap.total_usage_mb > 1000) \/ df_price_cap.shape[0] * 100, $/;"	kind:variable	line:45
+rows	../python/jupyter_notebooks/airline_prod.py	/^rows = df_price_cap.shape[0]$/;"	kind:variable	line:222
+scaler	../python/jupyter_notebooks/unused.py	/^scaler = StandardScaler()$/;"	kind:variable	line:105
+seatcol	../python/jupyter_notebooks/clean_psnger_seats.py	/^seatcol=[$/;"	kind:variable	line:39
+seed	../python/jupyter_notebooks/unused.py	/^seed = 1337$/;"	kind:variable	line:212
+smp_df_all	../python/jupyter_notebooks/making_plots.py	/^smp_df_all = df_all.groupby(['datacap', 'timecap'])\\$/;"	kind:variable	line:61
+smp_df_all	../python/jupyter_notebooks/making_plots.py	/^smp_df_all = df_all.sample(n=5000)$/;"	kind:variable	line:56
+sns	../python/jupyter_notebooks/airline_prod.py	/^import seaborn as sns$/;"	kind:namespace	line:9
+sns	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^import seaborn as sns$/;"	kind:namespace	line:130
+sns	../python/jupyter_notebooks/making_plots.py	/^import seaborn as sns$/;"	kind:namespace	line:11
+sp_randint	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^from scipy.stats import randint as sp_randint$/;"	kind:unknown	line:71
+sp_uniform	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^from scipy.stats import uniform as sp_uniform$/;"	kind:unknown	line:72
+sugar.py	../python/wifipricing/sugar.py	1;"	kind:file	line:1
+test_notebook.py	../python/jupyter_notebooks/test_notebook.py	1;"	kind:file	line:1
+unused.py	../python/jupyter_notebooks/unused.py	1;"	kind:file	line:1
+unused.py	../python/wifipricing/unused.py	1;"	kind:file	line:1
+wifi_calculations.py	../python/wifipricing/wifi_calculations.py	1;"	kind:file	line:1
+y	../python/jupyter_notebooks/unused.py	/^y = df_summarized_datacap['profit_per_psn']$/;"	kind:variable	line:154
+y	../python/jupyter_notebooks/unused.py	/^y = df_summarized_datacap['profit_per_psn']$/;"	kind:variable	line:98
+y_pred	../python/jupyter_notebooks/unused.py	/^y_pred = lasso_pipe.predict(X_test)$/;"	kind:variable	line:138
+y_test	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^X_train, X_test, y_train, y_test = train_test_split(lgb_data['data'], $/;"	kind:variable	line:79
+y_test	../python/jupyter_notebooks/unused.py	/^X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)$/;"	kind:variable	line:124
+y_test	../python/jupyter_notebooks/unused.py	/^X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)$/;"	kind:variable	line:179
+y_train	../python/jupyter_notebooks/fitting_tuned_lgb.py	/^X_train, X_test, y_train, y_test = train_test_split(lgb_data['data'], $/;"	kind:variable	line:79
+y_train	../python/jupyter_notebooks/unused.py	/^X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)$/;"	kind:variable	line:124
+y_train	../python/jupyter_notebooks/unused.py	/^X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)$/;"	kind:variable	line:179
