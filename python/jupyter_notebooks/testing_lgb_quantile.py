@@ -53,11 +53,9 @@ clf = lgb.LGBMRegressor(objective='quantile',
                         n_estimators=100)
 
 
-alphas = [0.05, 0.5, 0.95]
+models = {'lower': 0.05, 'median':0.5, 'upper':0.95}
 
-predictions = []
-
-for i, alp in enumerate(alphas):
+for k,alp in models.items():
     clf.set_params(alpha=alp)
 
     clf.fit(X, y,
@@ -65,9 +63,9 @@ for i, alp in enumerate(alphas):
             eval_metric='quantile',
             early_stopping_rounds=5)
 
-    predictions.append(clf.predict(xx))
+    models[k] = clf.predict(xx)
 
-y_lower, y_pred, y_upper = predictions
+y_lower, y_pred, y_upper = models['lower'], models['median'], models['upper']
 
 # Plot the function, the prediction and the 90% confidence interval based on
 # the MSE
