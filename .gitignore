@@ -10,6 +10,7 @@ cache
 **userflight*.csv
 **flight_stats*.csv
 data/summarized_data**
+models/*_data_*.joblib
 *.pyc
 *.ipynb_checkpoints
 **pycache
