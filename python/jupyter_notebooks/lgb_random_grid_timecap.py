@@ -2,12 +2,12 @@
 ### RandomgridSearchCV to tune lgb for timecap subset 
 
 #%%
-N_HYPER = 150
+N_HYPER = 75 
 SEED = 1337
 DEVICE = 'gpu'
 N_JOBS = 4 
 N_ROWS= None
-# N_ROWS= 5000
+# N_ROWS= 500 
 
 
 #%%
@@ -56,9 +56,9 @@ def get_lgb_data(df_summarized):
     catcols = X.select_dtypes('object').columns
     X[catcols]  = X[catcols].astype('category')
 
-    return {'data':X, 'target':y}
+    return {'data':X, 'target':y} 
 
-lgb_data = get_lgb_data(df_data)
+lgb_data = get_lgb_data(df_data) 
 print(lgb_data['data'].head())
 
 
@@ -93,30 +93,26 @@ hyper_grid = {
 
 # This passes additional args that are not in LGBMModel args
 fit_params={
-    'eval_set' : [(X_test,y_test)],
+    'eval_set' : [(X_test, y_test)],
     'eval_names': ['valid'],
     'early_stopping_rounds':30,
     'categorical_feature': 'auto',      
     'verbose':[1000]
 }
 
-models = {'lower': 0.05, 'median':0.5, 'upper':0.95}
+model_fitting = {'lower': 0.05, 'median':0.5, 'upper':0.95}
 
+#%%
+# Tuning model by grid search
 import time
 start = time.time()
-
-for k, alp in models.items():
-    lgb_reg = lgb.LGBMRegressor(
-        random_state=SEED, 
-        n_jobs=4,
-        device='gpu',
-        objective='quantile',
-        alpha = alp
-    )
+for k, alp in model_fitting.items():
+    lgb_reg = lgb.LGBMRegressor(random_state=SEED, n_jobs=4, objective='quantile')
+    lgb_reg.set_params(alpha = alp)
 
     rcv = RandomizedSearchCV(
-        estimator=lgb_reg, 
-        param_distributions=hyper_grid, 
+        estimator=lgb_reg,
+        param_distributions=hyper_grid,
         n_iter=N_HYPER,
         cv=5,
         random_state=SEED,
@@ -125,31 +121,41 @@ for k, alp in models.items():
 
     print(f'\n\n Fitting {k} quantile: {X_train.shape}\n')
 
-    models[k] = rcv.fit(X_train, y_train, **fit_params)
+    # Validation
+    rcv.fit(X_train, y_train, **fit_params)
+    y_validate = rcv.predict(X_test)
+
+    # Refitting model with best param/full dataset 
+    lgb_reg = lgb.LGBMRegressor(random_state=SEED, n_jobs=4, objective='quantile')
+    lgb_reg.set_params(alpha = alp)
+    lgb_reg.set_params(**rcv.best_params_)
+
+    print(f'\n\n Refitting on full dataset with the following parameters:')
+    print(lgb_reg.get_params())
+
+    refit_params={'categorical_feature': 'auto'}
+    model = lgb_reg.fit(lgb_data['data'], lgb_data['target'], **refit_params)
+
+    model_fitting[k] = {'model': model,
+                        'y_test': y_test,
+                        'y_predict': y_validate,
+                        'training_data_size': X_train.shape,
+                        'cv_results': rcv.cv_results_}
 
 end = time.time()
 
-print(f'Fitting took {round((end - start) / 60)} minutes')
+print(f'Fitting by random grid search took {round((end - start) / 60)} minutes')
 
+for k, v in model_fitting.items():
+    print(f'\n{k}---------------------\n')
+    print(v['model'])
 
+#%%
+# saving results
 from datetime import datetime
 curtime = datetime.now().strftime("%Y%m%d_%H_%M")  
 prefix = 'models/lgb_randgrid_timecap'
 
-for k, mod in models.items():
+for k, mod in model_fitting.items():
     file = prefix + f'_quantile_{k}_' + curtime+ ".joblib"
     joblib.dump(mod,  file)
-
-file = prefix + '_data_' + curtime+ ".joblib"
-joblib.dump({'X_train':X_train, 'X_test':X_test, 'y_train':y_train, 'y_test':y_test}, file)
-
-scores = rcv.cv_results_['mean_test_score']
-score_sorted = scores.argsort()
-score_sorted
-
-for i, ind in enumerate(score_sorted):
-        print(i)
-        print(rcv.cv_results_['params'][ind])
-
-        if i > 3:
-            break
