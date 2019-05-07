@@ -7,8 +7,9 @@ import re
 import numpy as np
 import pandas as pd
 from wifipricing.modeling_prepartions import get_lgb_data
-from wifipricing.model_tuning import lgb_random_search
 from wifipricing.modeling_prepartions import label_transform
+from wifipricing.model_tuning import lgb_random_search
+from wifipricing.model_tuning import rmse
 from scipy.stats import randint as sp_randint
 from scipy.stats import uniform as sp_uniform
 from sklearn.model_selection import train_test_split
@@ -18,11 +19,8 @@ import time
 from datetime import datetime
 
 N_HYPER = 200
-#N_HYPER = 1
-SEED = 1337
 N_JOBS = 4
 N_ROWS= None
-#N_ROWS= 10000
 HYPER_GRID = {
     'num_leaves': np.arange(5, 300, 3),
     'min_child_samples': np.arange(100, 3000, 100),
@@ -56,23 +54,27 @@ for subset, path in data_paths.items():
 
     quantiles = {'lower': 0.05, 'median':0.5, 'upper':0.95}
 
+    curtime = datetime.now().strftime("%Y%m%d_%H_%M")  
     start = time.time()
     # innerloop: 3 quantile regression alphas 
     for quantile, alp in quantiles.items():
         print(f'\n\n Fitting {quantile} quantile: {X_train.shape}\n')
         # Make sure that alpha is reset after each run
-        lgb_reg = lgb.LGBMRegressor(random_state=SEED, n_jobs=4, objective='quantile')
+        seed=np.random.randint(0, 10000)
+        lgb_reg = lgb.LGBMRegressor(random_state=seed, n_jobs=4,
+                                    n_estimators=100, objective='quantile')
 
         # Validation
         rcv = lgb_random_search(
             X_train, X_test, y_train, y_test, lgb_reg, alp,
-            HYPER_GRID, N_HYPER, SEED, cat_feat, cv=5
+            HYPER_GRID, N_HYPER, seed, cat_feat, rmse, cv=5
         )
 
         y_validate = rcv.predict(X_test)
 
         # Refitting model with best param/full dataset 
-        lgb_reg = lgb.LGBMRegressor(random_state=SEED, n_jobs=4, objective='quantile')
+        lgb_reg = lgb.LGBMRegressor(random_state=seed, n_jobs=4,
+                                    n_estimators=1000, objective='quantile')
         lgb_reg.set_params(alpha = alp)
         lgb_reg.set_params(**rcv.best_params_)
 
@@ -85,22 +87,19 @@ for subset, path in data_paths.items():
         }
         model = lgb_reg.fit(X, y, **refit_params)
 
-        quantiles[quantile] = {'model': model,
-                               'y_test': y_test,
-                               'y_predict': y_validate,
-                               'X_sample': X_test.sample(n=1000),
-                               'label_encoders': label_encoders,
-                               'features': X_test.columns,
-                               'training_data_size': X_train.shape,
-                               'cv_results': rcv.cv_results_}
+        results = {'model': model,
+                   'seed': seed,
+                   'RMSE': rmse(y_test, y_validate)[1],
+                   'y_test': y_test,
+                   'y_predict': y_validate,
+                   'X_sample': X_test.sample(n=1000),
+                   'label_encoders': label_encoders,
+                   'features': X_test.columns,
+                   'training_data_size': X_train.shape,
+                   'random_grid_cv': rcv}
+
+        fnm = f'models/lgb_tuned_{subset}_{quantile}_quantile_{curtime}.joblib'
+        joblib.dump(results, fnm)
 
     end = time.time()
     print(f'Fitting by random grid search for {subset} took {round((end - start) / 60)} minutes')
-
-    # saving results
-    curtime = datetime.now().strftime("%Y%m%d_%H_%M")  
-    prefix = f'models/lgb_randgrid_{subset}'
-
-    for quantile, item in quantiles.items():
-        file = prefix + f'_quantile_{quantile}_' + curtime+ ".joblib"
-        joblib.dump(item,  file)

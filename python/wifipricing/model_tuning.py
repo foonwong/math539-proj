@@ -11,17 +11,20 @@ from math import sqrt
 import time
 
 
+
 def lgb_random_search(
         X_train, X_test, y_train, y_test, 
-        regressor, alp, hyper_grid, n_hyper, seed, categorical_features, cv=5):
+        regressor, alp, hyper_grid, n_hyper, seed, 
+        categorical_features, metrics, cv=5):
     # This passes additional args that are not in LGBMModel args
     fit_params={
         'eval_set' : [(X_test, y_test)],
-        'eval_names': ['valid'],
+        'eval_names': ['validation set'],
+        'eval_metric': metrics,
         'early_stopping_rounds':30,
         'feature_name': list(X_test.columns),
         'categorical_feature': categorical_features,
-        'verbose':[1000]
+        'verbose':[10]
     }
 
     regressor.set_params(alpha = alp)
@@ -32,9 +35,15 @@ def lgb_random_search(
         n_iter=n_hyper,
         cv=cv,
         random_state=seed,
-        verbose=15
+        verbose=2
     )
 
     rcv.fit(X_train, y_train, **fit_params)
 
     return rcv
+
+def rmse(y_true, y_pred):
+    """returns (eval_name, eval_result, is_bigger_better)"""
+    result = sqrt(mean_squared_error(y_true, y_pred))
+
+    return ('RMSE', result, False)

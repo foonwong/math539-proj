@@ -39,7 +39,6 @@ def get_lgb_data(df_summarized, subset):
         'datacap': [
             'product_name'
             ,'flight_id'
-            ,'airline'
             ,'jack_seat_count'
             ,'total_passengers'
             ,'total_usage_mb'
@@ -60,7 +59,6 @@ def get_lgb_data(df_summarized, subset):
         'timecap': [
             'product_name'
             ,'flight_id'
-            ,'airline'
             ,'jack_seat_count'
             ,'total_passengers'
             ,'total_usage_mb'
@@ -81,7 +79,6 @@ def get_lgb_data(df_summarized, subset):
         'fulldata': [
             'product_name'
             ,'flight_id'
-            ,'airline'
             ,'jack_seat_count'
             ,'total_passengers'
             ,'total_usage_mb'
