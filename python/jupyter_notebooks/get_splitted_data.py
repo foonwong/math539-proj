@@ -41,4 +41,4 @@ dfs_summarized = get_splitted_wifi_data(
 #%%
 
 for nm, df in dfs_summarized.items():
-    df.to_pickle(f'data/summarized_data/summarized_{nm}.pkl', compression='gzip', index=False)
+    df.to_pickle(f'data/summarized_data/summarized_{nm}.pkl', compression='gzip')
