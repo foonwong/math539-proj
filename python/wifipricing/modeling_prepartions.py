@@ -2,10 +2,28 @@ import pandas as pd
 import re
 from itertools import compress
 from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import LabelEncoder
 from .data_reader import data_reader
 from .data_reader import _flight_df_add_features
 from .wifi_calculations import get_profit
 from .sugar import missing_data_report
+
+
+def label_transform(df):
+    """
+    modifies input df to label encoded and return dict of labelencoders
+    """
+
+    catcols = df.select_dtypes('category').columns
+
+    dict_encoders = {}
+    for col in catcols:
+        le = LabelEncoder()
+        df[col] = le.fit_transform(df[col]) 
+        dict_encoders[col] = le
+
+    return dict_encoders
+
 
 def get_lgb_data(df_summarized, subset):
     """
@@ -45,7 +63,7 @@ def get_lgb_data(df_summarized, subset):
             ,'airline'
             ,'jack_seat_count'
             ,'total_passengers'
-           ,'total_usage_mb'
+            ,'total_usage_mb'
             ,'data_per_psn'
             ,'total_revenue_usd'
             ,'data_per_psn'
@@ -85,10 +103,8 @@ def get_lgb_data(df_summarized, subset):
     X = df_summarized.drop(columns=dropcols[subset])
     y = df_summarized['profit_per_psn']
 
-    catcols = X.select_dtypes('object').columns
-    X[catcols]  = X[catcols].astype('category')
-
     return [X, y] 
+
 
 
 def get_splitted_wifi_data(wifi_path, ref_path, nrows=None, dropcols=True):

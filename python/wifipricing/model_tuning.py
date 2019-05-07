@@ -11,13 +11,15 @@ from math import sqrt
 import time
 
 
-def lgb_random_search(X_train, X_test, y_train, y_test, regressor, alp, hyper_grid, n_hyper, seed, cv=5):
+def lgb_random_search(
+        X_train, X_test, y_train, y_test, 
+        regressor, alp, hyper_grid, n_hyper, seed, categorical_features, cv=5):
     # This passes additional args that are not in LGBMModel args
     fit_params={
         'eval_set' : [(X_test, y_test)],
         'eval_names': ['valid'],
         'early_stopping_rounds':30,
-        'categorical_feature': 'auto',      
+        'categorical_feature': categorical_features,      
         'verbose':[1000]
     }
 

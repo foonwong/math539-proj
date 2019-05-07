@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from wifipricing.modeling_prepartions import get_lgb_data
 from wifipricing.model_tuning import lgb_random_search
+from wifipricing.modeling_prepartions import label_transform
 from scipy.stats import randint as sp_randint
 from scipy.stats import uniform as sp_uniform
 from sklearn.model_selection import train_test_split
@@ -32,17 +33,22 @@ HYPER_GRID = {
 }
 
 data_paths = {
-    'datacap':'data/summarized_data/summarized_datacap.csv',
-    'timecap':'data/summarized_data/summarized_timecap.csv',
-    'fulldata':'data/summarized_data/summarized_all.csv'
+    'datacap':'data/summarized_data/df_summarized_datacap_pickle.gzip',
+    'timecap':'data/summarized_data/df_summarized_timecap_pickle.gzip',
+    'fulldata':'data/summarized_data/df_summarized_all_pickle.gzip'
 }
 
 # Outerloop: 3 data subset
 for subset, path in data_paths.items():
-    df = pd.read_csv(path, nrows=N_ROWS)
+    df = pd.read_pickle(path)
 
     X, y = get_lgb_data(df, subset)
+    label_encoders = label_transform(X)
 
+    # categorical_feature parameter for lgb
+    # https://lightgbm.readthedocs.io/en/latest/_modules/lightgbm/sklearn.html
+    cat_feat = list(label_encoders.keys())
+    print(cat_feat)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
     print('X train\n', X_train.dtypes)
@@ -58,8 +64,11 @@ for subset, path in data_paths.items():
         lgb_reg = lgb.LGBMRegressor(random_state=SEED, n_jobs=4, objective='quantile')
 
         # Validation
-        rcv = lgb_random_search(X_train, X_test, y_train, y_test, lgb_reg, alp,
-        HYPER_GRID, N_HYPER, SEED, cv=5)
+        rcv = lgb_random_search(
+            X_train, X_test, y_train, y_test, lgb_reg, alp,
+            HYPER_GRID, N_HYPER, SEED, cat_feat, cv=5
+        )
+
         y_validate = rcv.predict(X_test)
 
         # Refitting model with best param/full dataset 
@@ -70,12 +79,15 @@ for subset, path in data_paths.items():
         print(f'\n\n Refitting on full dataset with the following parameters:')
         print(lgb_reg.get_params())
 
-        refit_params={'categorical_feature': 'auto'}
+        refit_params={'categorical_feature': cat_feat}
         model = lgb_reg.fit(X, y, **refit_params)
 
         quantiles[quantile] = {'model': model,
                                'y_test': y_test,
                                'y_predict': y_validate,
+                               'X_sample': X_test.sample(n=1000),
+                               'label_encoders': label_encoders,
+                               'features': X_test.columns,
                                'training_data_size': X_train.shape,
                                'cv_results': rcv.cv_results_}
 
