@@ -7,9 +7,88 @@ from .data_reader import _flight_df_add_features
 from .wifi_calculations import get_profit
 from .sugar import missing_data_report
 
-def get_lgb_df(summarized_df):
+def get_lgb_data(df_summarized, subset):
+    """
+    return [X, y] for modeling from summarized dataframes
+    by dropping columns that are unnessary for modeling
+    
+    Args:
+        df_summarized (df): summarized df
+        subset (str): one of ["datacap", "timecap", "fulldata"]
+    """
 
-    return None
+    dropcols = {
+        'datacap': [
+            'product_name'
+            ,'flight_id'
+            ,'airline'
+            ,'jack_seat_count'
+            ,'total_passengers'
+            ,'total_usage_mb'
+            ,'data_per_psn'
+            ,'total_revenue_usd'
+            ,'data_per_psn'
+            ,'total_revenue_usd'
+            ,'revenue_per_psn'
+            ,'purchase_count'
+            ,'takerate'
+            ,'datacap'
+            ,'timecap_min'
+            ,'timecap'
+            ,'price_per_min'
+            ,'price_per_mb'
+            ,'profit_per_psn'
+        ],
+        'timecap': [
+            'product_name'
+            ,'flight_id'
+            ,'airline'
+            ,'jack_seat_count'
+            ,'total_passengers'
+           ,'total_usage_mb'
+            ,'data_per_psn'
+            ,'total_revenue_usd'
+            ,'data_per_psn'
+            ,'total_revenue_usd'
+            ,'revenue_per_psn'
+            ,'purchase_count'
+            ,'takerate'
+            ,'datacap'
+            ,'datacap_mb'
+            ,'timecap'
+            ,'price_per_min'
+            ,'price_per_mb'
+            ,'profit_per_psn'
+        ],
+        'fulldata': [
+            'product_name'
+            ,'flight_id'
+            ,'airline'
+            ,'jack_seat_count'
+            ,'total_passengers'
+            ,'total_usage_mb'
+            ,'data_per_psn'
+            ,'total_revenue_usd'
+            ,'data_per_psn'
+            ,'total_revenue_usd'
+            ,'revenue_per_psn'
+            ,'purchase_count'
+            ,'takerate'
+            ,'timecap_min'
+            ,'datacap_mb'
+            ,'price_per_min'
+            ,'price_per_mb'
+            ,'profit_per_psn'
+        ]
+    }
+
+    X = df_summarized.drop(columns=dropcols[subset])
+    y = df_summarized['profit_per_psn']
+
+    catcols = X.select_dtypes('object').columns
+    X[catcols]  = X[catcols].astype('category')
+
+    return [X, y] 
 
 
 def get_splitted_wifi_data(wifi_path, ref_path, nrows=None, dropcols=True):
