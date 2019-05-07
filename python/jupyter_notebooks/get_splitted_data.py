@@ -32,13 +32,13 @@ from wifipricing.modeling_prepartions import get_splitted_wifi_data
 from wifipricing.sugar import *
 
 #%%
-df_data, df_time, df_none, df_all = get_splitted_wifi_data(
+# a dict
+dfs_summarized = get_splitted_wifi_data(
     'data/df_rfp_dataset_raw_20181218185047.csv', 
     'data/data_reference.csv'
 )
 
 #%%
-nms = ['df_data', 'df_time', 'df_none', 'df_all']
 
-for df, nm in zip([df_data, df_time, df_none, df_all], nms):
-    df.to_csv(f'{nm}.csv')
+for nm, df in dfs_summarized.items():
+    df.to_csv(f'data/summarized_data/summarized_{nm}.csv')
