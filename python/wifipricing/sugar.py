@@ -1,6 +1,25 @@
 import re
 import pandas as pd
+import json
 import warnings 
+
+def get_categorical_encodings(df, save_path=None):
+    "Returns a dict of categorical encoding for future reference"
+
+    catcols = df.select_dtypes('category').columns
+
+    dict_cat = {}
+    for col in catcols:
+        encoding = {cat:lab for lab, cat in enumerate(df[col].cat.categories)}
+        dict_cat[col] = encoding
+
+    if save_path:
+        json = json.dumps(dict_cat)
+        f = open(save_path, 'w')
+        f.write(json)
+        f.close()
+
+    return dict_cat
 
 def preview(df, x=5):
     "Show first x and last x rows and dimensions of a dataframe"
