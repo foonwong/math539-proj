@@ -92,6 +92,10 @@ def get_lgb_data(df_summarized, subset):
 
 
 def get_splitted_wifi_data(wifi_path, ref_path, nrows=None, dropcols=True):
+    """
+    Returns dict of the three subset of summarized data
+    """
+
     input_col=['product_name', 'price_usd', 'flight_id', 'airline', 'aircraft_type',
         'flight_duration_hrs', 'total_usage_mb', 'seat_count', 'total_passengers',
         'night_flight', 'flight_type', 'price_usd', 'ife', 'e_xtv', 'e_xphone',
@@ -123,7 +127,8 @@ def get_splitted_wifi_data(wifi_path, ref_path, nrows=None, dropcols=True):
 
 
 def get_product_summary(df_in):
-    """Summarizing wifi dataframe for a product level analysis
+    """
+    Summarizing wifi dataframe for a product level analysis:wifi_path
 
     Will create new columns for product data/time cap, pricing and profit
     if possible.
