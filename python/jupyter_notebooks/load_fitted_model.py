@@ -18,19 +18,19 @@ for sub in subset:
     joblibs = [file for file in alljoblibs if sub in file]
 
     for kind in ['data', 'upper', 'median', 'lower']:
-        subset[sub][kind] = [x for x in joblibs if f'_{kind}_' in x][0]
+        try:
+            path = [x for x in joblibs if f'_{kind}_' in x][0]
+            subset[sub].update({kind: joblib.load(f'models/{path}')})
+        except:
+            pass
 
-print(subset)
+print(subset.keys())
+print(subset['datacap'].keys())
 
-for sub in subset:
-    joblibs = [file for file in alljoblibs if sub in file]
-
-    for kind in ['data', 'upper', 'median', 'lower']:
-        subset[sub][kind] = joblib.load('models/' + [x for x in joblibs if f'_{kind}_' in x][0])
 
 #%%
-for k,v  in subset.items():
-    print(v['median'].best_params_ )
+for k,v  in subset['datacap'].items():
+    print(k, v['RMSE'])
 
 #%%
 
