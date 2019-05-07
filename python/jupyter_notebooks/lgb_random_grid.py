@@ -17,12 +17,12 @@ from sklearn.externals import joblib
 import time
 from datetime import datetime
 
-N_HYPER = 150
-N_HYPER = 10
+N_HYPER = 200
+#N_HYPER = 1
 SEED = 1337
-N_JOBS = 4 
+N_JOBS = 4
 N_ROWS= None
-N_ROWS= 10000
+#N_ROWS= 10000
 HYPER_GRID = {
     'num_leaves': np.arange(5, 300, 3),
     'min_child_samples': np.arange(100, 3000, 100),
@@ -48,7 +48,7 @@ for subset, path in data_paths.items():
     # categorical_feature parameter for lgb
     # https://lightgbm.readthedocs.io/en/latest/_modules/lightgbm/sklearn.html
     cat_feat = list(label_encoders.keys())
-    print(cat_feat)
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
     print('X train\n', X_train.dtypes)
@@ -79,7 +79,10 @@ for subset, path in data_paths.items():
         print(f'\n\n Refitting on full dataset with the following parameters:')
         print(lgb_reg.get_params())
 
-        refit_params={'categorical_feature': cat_feat}
+        refit_params={
+            'feature_name': list(X_train.columns),
+            'categorical_feature': cat_feat
+        }
         model = lgb_reg.fit(X, y, **refit_params)
 
         quantiles[quantile] = {'model': model,
@@ -96,7 +99,7 @@ for subset, path in data_paths.items():
 
     # saving results
     curtime = datetime.now().strftime("%Y%m%d_%H_%M")  
-    prefix = f'models/testing_lgb_randgrid_{subset}'
+    prefix = f'models/lgb_randgrid_{subset}'
 
     for quantile, item in quantiles.items():
         file = prefix + f'_quantile_{quantile}_' + curtime+ ".joblib"

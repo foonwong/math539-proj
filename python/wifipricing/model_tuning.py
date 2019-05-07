@@ -19,7 +19,8 @@ def lgb_random_search(
         'eval_set' : [(X_test, y_test)],
         'eval_names': ['valid'],
         'early_stopping_rounds':30,
-        'categorical_feature': categorical_features,      
+        'feature_name': list(X_test.columns),
+        'categorical_feature': categorical_features,
         'verbose':[1000]
     }
 
