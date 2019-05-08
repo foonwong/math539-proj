@@ -7,8 +7,8 @@ import re
 import numpy as np
 import pandas as pd
 from wifipricing.modeling_prepartions import get_lgb_data
-from wifipricing.modeling_prepartions import label_transform
-from wifipricing.model_tuning import lgb_random_search
+from wifipricing.modeling_prepartions import onehot_transform 
+from wifipricing.model_tuning import lgb_random_search_onehot
 from wifipricing.model_tuning import rmse
 from scipy.stats import randint as sp_randint
 from scipy.stats import uniform as sp_uniform
@@ -18,7 +18,7 @@ from sklearn.externals import joblib
 import time
 from datetime import datetime
 
-N_HYPER = 200
+N_HYPER = 100
 N_JOBS = 4
 N_ROWS= None
 HYPER_GRID = {
@@ -41,7 +41,7 @@ for subset, path in data_paths.items():
     df = pd.read_pickle(path)
 
     X, y = get_lgb_data(df, subset)
-    X_ohe, category_order = pd.get_dummies(X,sparse=True) 
+    X_ohe, category_order = onehot_transform(X) 
 
     X_train, X_test, y_train, y_test = train_test_split(X_ohe, y, test_size=0.2)
 
@@ -61,9 +61,9 @@ for subset, path in data_paths.items():
                                     n_estimators=100, objective='quantile')
 
         # Validation
-        rcv = lgb_random_search(
+        rcv = lgb_random_search_onehot(
             X_train, X_test, y_train, y_test, lgb_reg, alp,
-            HYPER_GRID, N_HYPER, seed, cat_feat, rmse, cv=5
+            HYPER_GRID, N_HYPER, seed, rmse, cv=5
         )
 
         y_validate = rcv.predict(X_test)
@@ -78,10 +78,9 @@ for subset, path in data_paths.items():
         print(lgb_reg.get_params())
 
         refit_params={
-            'feature_name': list(X_train.columns),
-            'categorical_feature': cat_feat
+            'feature_name': list(X_train.columns)
         }
-        model = lgb_reg.fit(X, y, **refit_params)
+        model = lgb_reg.fit(X_ohe, y, **refit_params)
 
         results = {'model': model,
                    'seed': seed,

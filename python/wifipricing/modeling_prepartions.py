@@ -36,7 +36,7 @@ def onehot_transform(df):
     for col in catcols:
         dict_cat.update({col: df[col].cat.categories})
 
-    df_ohe = pd.get_dummies(df, sparse=True)
+    df_ohe = pd.get_dummies(df)
 
     return df_ohe, dict_cat
 

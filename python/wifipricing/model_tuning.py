@@ -47,7 +47,7 @@ def lgb_random_search(
 def lgb_random_search_onehot(
         X_train, X_test, y_train, y_test, 
         regressor, alp, hyper_grid, n_hyper, seed, 
-        categorical_features, metrics, cv=5):
+         metrics, cv=5):
     """sklearn RandomizedSearchCV wrapper (uses OneHot Encoded data)"""
     # This passes additional args that are not in LGBMModel args
     fit_params={
