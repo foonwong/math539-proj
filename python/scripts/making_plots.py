@@ -3,6 +3,7 @@
 
 #%%
 # Notebook options
+import os
 import sys
 import importlib
 import re
@@ -19,23 +20,14 @@ InteractiveShell.ast_node_interactivity = "all"
 
 #%% [markdown]
 ### Pre-summarize data
-#%%
-# import wifipricing.modeling_prepartions
-# importlib.reload(wifipricing.modeling_prepartions)
-# from wifipricing.modeling_prepartions import get_splitted_wifi_data 
-# df_data, df_time, df_none, df_all = get_splitted_wifi_data(
-#     'data/df_rfp_dataset_raw_20181218185047.csv', 
-#     'data/data_reference.csv'
-# )
-
-# df_all.columns
-# df_all
+paths = [p for p in os.listdir('data/summarized_data/') if 'pickle' in p]
+df_all, df_data, df_time, _ = [pd.read_pickle(os.path.join('data/summarized_data', p)) for p in paths]
 
 #%%
-df_data = pd.read_csv('data/summarized_data/summarized_datacap.csv')
-df_time = pd.read_csv('data/summarized_data/summarized_timecap.csv')
-df_all = pd.read_csv('data/summarized_data/summarized_all.csv')
+df_data
+df_data.filter(regex='per_')
 
+#%%
 f'Summarized (data-capped): {df_data.shape}'
 f'Summarized (time-capped): {df_time.shape}'
 f'Summarized (full dataset): {df_all.shape}'
@@ -64,17 +56,28 @@ smp_df_all = df_all.groupby(['datacap', 'timecap'])\
 
 g = sns.FacetGrid(df_all, row='datacap', col='timecap', 
     sharex=False, sharey=False,
-    aspect=2, size=4)
+    aspect=2, size=8)
 
 
 g.map(sns.distplot, "profit_per_psn")
 
 
-g = sns.FacetGrid(df_all.sample(10000), row='datacap', col='timecap', 
-    sharex=False, sharey=False,
-    aspect=2, height=4)
+# g = sns.FacetGrid(df_all.sample(10000), row='datacap', col='timecap', 
+    # sharex=False, sharey=False,
+    # aspect=2, height=4)
+# 
+# g.map(sns.kdeplot, "revenue_per_psn", "data_per_psn")
 
-g.map(sns.kdeplot, "revenue_per_psn", "data_per_psn")
+#%%
+smp_df_data = df_data.sample(n=5000)
+
+plt.figure(figsize=(6, 8))
+fig = sns.distplot(smp_df_data['profit_per_psn'])
+fig.set_title('Profit per person (datacap subset)')
+
+plt.figure(figsize=(6, 8))
+fig = sns.distplot(smp_df_all['profit_per_psn'])
+fig.set_title('Profit per person (Full dataset)')
 
 
 #%%
