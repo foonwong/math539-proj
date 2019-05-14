@@ -27,6 +27,7 @@ df_all, df_data, df_time, _ = [pd.read_pickle(os.path.join('data/summarized_data
 df_data
 df_data.filter(regex='per_')
 
+
 #%%
 f'Summarized (data-capped): {df_data.shape}'
 f'Summarized (time-capped): {df_time.shape}'
