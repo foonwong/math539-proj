@@ -1,9 +1,7 @@
-### Checking what features will be used for model tuning 
 #%% [markdown]
+### Checking what features will be used for model tuning 
+# just a quick check to see what features are there and what will be used
 
-## just a quick check to see what features are there and what will be used
-
-#%%
 import sys
 sys.path.append('python')
 import importlib
@@ -53,6 +51,18 @@ for subset, path in data_paths.items():
     print(X.columns)
 
 
+
+#%%
+from wifipricing.modeling_prepartions import onehot_transform
+
+a, b = onehot_transform(X)
+
+
+#%%
+a
+
+#%%
+b
 
 
 #%%
