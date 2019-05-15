@@ -11,7 +11,7 @@ from .sugar import missing_data_report
 
 def label_transform(df):
     """
-    modifies input df to label encoded and return dict of labelencoders
+    modifies input df to label encoded and returns {column: sklearn.preprocessing.LabelEncoder}
     """
 
     catcols = df.select_dtypes('category').columns
@@ -23,6 +23,22 @@ def label_transform(df):
         dict_encoders[col] = le
 
     return dict_encoders
+
+
+def onehot_transform(df):
+    """
+    returns dummy encoded sparse and dict of categories to be used later 
+    """
+
+    catcols = df.select_dtypes('category').columns
+
+    dict_cat = {}
+    for col in catcols:
+        dict_cat.update({col: df[col].cat.categories})
+
+    df_ohe = pd.get_dummies(df)
+
+    return df_ohe, dict_cat
 
 
 def get_lgb_data(df_summarized, subset):
